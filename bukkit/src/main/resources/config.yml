@@ -1,0 +1,12 @@
+TypeDatabase:
+  address: '127.0.0.1'
+  port: 3306
+  database: 'test'
+  username: 'root'
+  password: 'password'
+UserDatabase:
+  address: '127.0.0.1'
+  port: 3306
+  database: 'test'
+  username: 'root'
+  password: 'password'

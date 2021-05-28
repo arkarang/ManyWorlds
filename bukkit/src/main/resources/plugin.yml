@@ -1,0 +1,5 @@
+main: com.minepalm.manyworlds.bukkit
+name: ManyWorlds
+version: 1.0.0
+author: Arkarang
+depend: [SlimeWorldManager]
