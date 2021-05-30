@@ -32,6 +32,12 @@ public class Commands extends BaseCommand {
         }
     }
 
+    @Subcommand("목록")
+    public void list(Player player){
+        player.sendMessage("월드목록");
+        Bukkit.getWorlds().forEach(world->player.sendMessage(world.getName()));
+    }
+
     @Subcommand("생성")
     public void createOwn(Player player, String name){
         create(player, name, player.getUniqueId());

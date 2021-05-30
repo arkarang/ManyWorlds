@@ -1,5 +1,6 @@
 package com.minepalm.manyworlds.bukkit;
 
+import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.grinderwolf.swm.plugin.loaders.mysql.MysqlLoader;
 import lombok.Getter;
@@ -31,9 +32,11 @@ public class ManyWorldPlugin extends JavaPlugin {
         conf = new Conf("config.yml");
         swm = (SWMPlugin)Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
         slimeUtils = new SWMUtils(swm);
+        PaperCommandManager manager = new PaperCommandManager(this);
+        manager.registerCommand(new Commands());
         try {
-            userLoader = slimeUtils.getLoader(conf.getUserDBSetting());
-            typeLoader = slimeUtils.getLoader(conf.getTypeDBSetting());
+            userLoader = slimeUtils.getLoader(conf.getUserDBSetting(), "user_worlds");
+            typeLoader = slimeUtils.getLoader(conf.getTypeDBSetting(), "world_type");
         }catch (SQLException e) {
             e.printStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);

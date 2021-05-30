@@ -48,12 +48,8 @@ public class SWMUtils {
         }
     }
 
-    public MysqlLoader getLoader(Properties props) throws SQLException {
-        return new MysqlLoader(
-                props.getProperty("address"),
-                Integer.parseInt(props.getProperty("port")),
-                props.getProperty("database"),
-                props.getProperty("username"),
-                props.getProperty("password"));
+    public MysqlLoader getLoader(Properties props, String tableName) throws SQLException {
+        props.setProperty("table", tableName);
+        return new MysqlLoader(props);
     }
 }

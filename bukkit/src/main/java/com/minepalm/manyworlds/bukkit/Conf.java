@@ -1,9 +1,8 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.minepalm.arkarangutils.SimpleConfig;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
+import com.minepalm.arkarangutils.bukkit.SimpleConfig;
+
 import java.util.Properties;
 
 public class Conf extends SimpleConfig {

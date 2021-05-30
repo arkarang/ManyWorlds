@@ -7,9 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
-        <module name="bukkit" />
         <module name="api" />
         <module name="bungeecord" />
+        <module name="manyworlds-bukkit" />
       </profile>
     </annotationProcessing>
   </component>
