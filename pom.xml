@@ -9,10 +9,10 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>bungeecord</module>
-        <module>bukkit</module>
-        <module>core</module>
-        <module>api</module>
+        <module>manyworlds-proxy</module>
+        <module>manyworlds-bukkit</module>
+        <module>manyworlds-core</module>
+        <module>manyworlds-api</module>
     </modules>
 
     <properties>
