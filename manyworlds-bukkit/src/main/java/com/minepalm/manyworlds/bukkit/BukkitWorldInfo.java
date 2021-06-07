@@ -1,13 +1,10 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldMetadata;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
 import lombok.*;
-import lombok.experimental.FieldNameConstants;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor(access=AccessLevel.PRIVATE)
@@ -24,16 +21,16 @@ public class BukkitWorldInfo implements WorldInfo {
 
     @Getter
     @NonNull
-    final JsonSlimeProperties propertyMap;
+    final ManyProperties propertyMap;
 
     @Setter
     WorldMetadata metadata;
 
-    public BukkitWorldInfo(String typeName, JsonSlimeProperties props){
+    public BukkitWorldInfo(String typeName, ManyProperties props){
         this(WorldType.SAMPLE, typeName, null, props);
     }
 
-    public BukkitWorldInfo(String typeName, UUID uuid, JsonSlimeProperties props){
+    public BukkitWorldInfo(String typeName, UUID uuid, ManyProperties props){
         this(WorldType.USER, typeName, uuid, props);
     }
 

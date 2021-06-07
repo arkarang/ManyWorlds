@@ -4,7 +4,7 @@ import com.minepalm.manyworlds.api.bukkit.PreparedWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
-import com.minepalm.manyworlds.bukkit.JsonSlimeProperties;
+import com.minepalm.manyworlds.bukkit.ManyProperties;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.database.AbstractMySQL;
 
@@ -44,7 +44,7 @@ public abstract class MySQLWorldDatabase extends AbstractMySQL implements WorldD
                 ps.setString(1, info.getWorldName());
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    return new MySQLWorld(info.clone(), rs.getBytes(1), JsonWorldMetadata.fromJson(rs.getString(2)), JsonSlimeProperties.fromString(rs.getString(3)));
+                    return new MySQLWorld(info.clone(), rs.getBytes(1), JsonWorldMetadata.fromJson(rs.getString(2)), ManyProperties.fromString(rs.getString(3)).toSlime());
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

@@ -5,7 +5,7 @@ import com.minepalm.manyworlds.api.util.WorldOutputStream;
 
 public interface WorldStrategy {
 
-    WorldInputStream serialize(WorldInputStream stream);
+    WorldInputStream serialize(WorldInputStream stream, ManyWorld world);
 
     WorldOutputStream deserialize(WorldOutputStream stream);
 }

@@ -4,7 +4,7 @@ import com.grinderwolf.swm.api.world.SlimeWorld;
 
 public interface ManyWorld extends SlimeWorld {
 
-    WorldMetadata getMetaData();
+    WorldMetadata getMetadata();
 
-    void setMetaData(WorldMetadata data);
+    void setMetadata(WorldMetadata data);
 }

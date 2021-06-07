@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class MySQLWorld implements PreparedWorld {
+    //todo: PreparedWorld#worldBytes -> semi-serialization
 
     final WorldInfo worldInfo;
     final byte[] worldBytes;

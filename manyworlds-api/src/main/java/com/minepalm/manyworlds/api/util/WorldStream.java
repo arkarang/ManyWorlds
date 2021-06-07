@@ -1,6 +1,14 @@
 package com.minepalm.manyworlds.api.util;
 
-public interface WorldStream {
+import io.netty.buffer.ByteBuf;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    void close();
+
+@Getter
+@RequiredArgsConstructor
+public class WorldStream {
+
+    final ByteBuf buffer;
+
 }
