@@ -1,8 +1,37 @@
 package com.minepalm.manyworlds.api;
 
+import com.minepalm.manyworlds.api.bukkit.WorldInfo;
+
+import java.util.List;
+import java.util.UUID;
+
 public interface GlobalDatabase {
 
-    BungeeSnapshot getBungeeSnapshot();
+    BungeeView getProxy();
 
-    BukkitSnapshot getBukkitSnapshot(String name);
+    ServerView getCurrentServer();
+
+    ServerView getServer(String name);
+
+    BukkitView getBukkitServer(String name);
+
+    List<BukkitView> getServers();
+
+    List<String> getLoadedWorlds(String serverName);
+
+    void register();
+
+    void unregister();
+
+    void registerWorld(BukkitView snapshot, WorldInfo info);
+
+    void unregisterWorld(String fullName);
+
+    void unregisterWorld(String serverName, String sampleName, UUID uuid);
+
+    boolean isWorldLoaded(WorldInfo info);
+
+    boolean isWorldLoaded(String fullName);
+
+    boolean isWorldLoaded(String serverName, String sampleName, UUID uuid);
 }

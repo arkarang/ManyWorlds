@@ -9,6 +9,27 @@ public class WorldInputStream extends WorldStream{
     }
 
     public WorldInputStream(byte[] bytes){
-        super(Unpooled.buffer().readBytes(bytes));
+        super(Unpooled.directBuffer().readBytes(bytes));
+    }
+
+    public byte[] read(byte[] toWrite){
+        buffer.readBytes(toWrite);
+        return toWrite;
+    }
+
+    public int readInt(){
+        return buffer.readInt();
+    }
+
+    public byte readByte(){
+        return buffer.readByte();
+    }
+
+    public short readShort(){
+        return buffer.readShort();
+    }
+
+    public boolean readBoolean(){
+        return buffer.readBoolean();
     }
 }

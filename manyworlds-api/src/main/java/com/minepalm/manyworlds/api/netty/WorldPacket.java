@@ -1,7 +1,16 @@
 package com.minepalm.manyworlds.api.netty;
 
-public interface WorldPacket {
+import com.minepalm.hellobungee.api.HelloMessage;
+import com.minepalm.manyworlds.api.ServerView;
+import io.netty.buffer.ByteBuf;
 
-    String getSender();
+public interface WorldPacket extends HelloMessage {
 
+    ServerView getFrom();
+
+    ServerView getTo();
+
+    ByteBuf write();
+
+    byte getPacketID();
 }

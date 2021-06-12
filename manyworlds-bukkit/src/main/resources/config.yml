@@ -1,10 +1,11 @@
-TypeDatabase:
-  address: '127.0.0.1'
-  port: 3306
-  database: 'test'
-  username: 'root'
-  password: 'password'
-UserDatabase:
+HelloBungee: 'proxy'
+ServerName: 'server1'
+Global:
+  Servers: 'manyworlds_servers'
+  Worlds: 'manyworlds_worlds'
+UserTableName: '`manyworlds`'
+SampleTableName: '`manyworlds_samples`'
+Database:
   address: '127.0.0.1'
   port: 3306
   database: 'test'

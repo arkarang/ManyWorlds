@@ -1,9 +1,23 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-//로딩된 월드를 관리하는 객체
+import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+
+import java.util.UUID;
+
 public interface WorldManager {
 
-    WorldDatabase getWorldDatabase();
+    WorldDatabase getWorldDatabase(WorldType type);
 
     WorldStorage getWorldStorage();
+
+    WorldLoader getWorldLoader(WorldType type);
+
+    void createNewWorld(WorldInfo info);
+
+    void loadWorld(WorldInfo info);
+
+    void save(WorldInfo info);
+
+    void save(String worldFullName);
+
 }

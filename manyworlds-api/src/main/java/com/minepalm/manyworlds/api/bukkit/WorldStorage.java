@@ -1,12 +1,28 @@
 package com.minepalm.manyworlds.api.bukkit;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public interface WorldStorage {
 
     void registerWorld(ManyWorld world);
 
-    ManyWorld unregisterWorld(UUID uuid);
+    void registerWorld(ManyWorld world, List<String> alias);
+
+    Collection<String> getWorldAlias(String name);
+
+    ManyWorld getLoadedWorld(String name);
+
+    List<ManyWorld> getLoadedWorlds(String tag);
+
+    List<String> getLoadedWorldsAll();
+
+    ManyWorld getLoadedWorld(WorldInfo info);
+
+    ManyWorld unregisterWorld(String name);
+
+    List<ManyWorld> unregisterWorlds(String tag);
 
     void shutdown();
 

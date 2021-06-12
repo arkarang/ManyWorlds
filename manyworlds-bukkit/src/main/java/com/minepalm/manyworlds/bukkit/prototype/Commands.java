@@ -19,7 +19,6 @@ import java.util.UUID;
 
 @CommandAlias("월드")
 public class Commands extends BaseCommand {
-
     @Subcommand("파일등록")
     public void register(Player player, String name, String worldName){
         World world = Bukkit.getWorld(worldName);
@@ -69,7 +68,6 @@ public class Commands extends BaseCommand {
             byte[] serializedWorld = ManyWorldPlugin.userLoader.loadWorld(worldName, false);
             CraftSlimeWorld world;
 
-            //todo PropertyMap 구현 - Json
             SlimePropertyMap propertyMap = new SlimePropertyMap();
                 /*
                 spawn: 0, 64, 0
@@ -116,7 +114,6 @@ public class Commands extends BaseCommand {
                 byte[] serializedWorld = ManyWorldPlugin.typeLoader.loadWorld(name, false);
                 CraftSlimeWorld world;
 
-                //todo PropertyMap 구현 - Json
                 SlimePropertyMap propertyMap = new SlimePropertyMap();
                 /*
                 spawn: 0, 64, 0

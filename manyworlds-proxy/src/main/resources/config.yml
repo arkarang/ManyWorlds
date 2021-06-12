@@ -1,0 +1,10 @@
+Name: 'proxy'
+Global:
+  Servers: 'manyworlds_servers'
+  Worlds: 'manyworlds_worlds'
+Database:
+  address: '127.0.0.1'
+  port: 3306
+  database: 'test'
+  username: 'root'
+  password: 'password'

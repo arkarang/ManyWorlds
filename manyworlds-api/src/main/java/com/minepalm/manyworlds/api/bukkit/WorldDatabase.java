@@ -1,9 +1,18 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-// name / byte[] / propertyMap / metadata / lastUsed
+import java.util.UUID;
+
 public interface WorldDatabase {
 
     PreparedWorld prepareWorld(WorldInfo info);
 
     void saveWorld(PreparedWorld world);
+
+    WorldInfo getWorldInfo(String fullName);
+
+    void deleteWorld(WorldInfo info);
+
+    void deleteWorld(String fullName);
+
+
 }

@@ -11,4 +11,7 @@ public class WorldStream {
 
     final ByteBuf buffer;
 
+    public void close(){
+        buffer.release();
+    }
 }

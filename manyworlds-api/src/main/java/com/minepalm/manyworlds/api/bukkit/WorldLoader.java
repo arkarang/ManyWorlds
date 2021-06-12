@@ -1,11 +1,13 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-//todo: 객체 상호작용 명료하게.
-public interface WorldLoader {
+import com.grinderwolf.swm.api.loaders.SlimeLoader;
 
-    ManyWorld deserialize(PreparedWorld preparedWorld);
+import java.io.IOException;
 
-    PreparedWorld serialize(ManyWorld world);
+public interface WorldLoader extends SlimeLoader {
 
-    WorldPipeline getPipeline(LoadPhase phase);
+    ManyWorld deserialize(PreparedWorld preparedWorld) throws IOException;
+
+    PreparedWorld serialize(ManyWorld world) throws IOException;
+
 }
