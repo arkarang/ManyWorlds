@@ -3,6 +3,7 @@ package com.minepalm.manyworlds.bukkit.test;
 import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
 import com.grinderwolf.swm.api.exceptions.NewerFormatException;
 import com.grinderwolf.swm.api.utils.SlimeFormat;
+import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.bukkit.CraftManyWorld;
@@ -20,6 +21,7 @@ import org.junit.runners.MethodSorters;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.List;
 import java.util.Properties;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -88,6 +90,10 @@ public class WorldDatabaseTest {
         Assert.assertNotNull(world);
     }
 
+    /*
+     * Performance Test
+     */
+    /*
     @Test
     public void asdf() throws IOException, CorruptedWorldException, NewerFormatException {
         RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");
@@ -99,6 +105,29 @@ public class WorldDatabaseTest {
         PreparedWorld pw = this.getPreparedWorld();
 
         long now = System.currentTimeMillis();
+
+        CraftSlimeWorld world = v1_12WorldUtils.deserializeWorld(loader, "asdf", bytes, pw.getMetadata().getProperties().asSlime(), false);
+        System.out.println("DESERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
+
+        now = System.currentTimeMillis();
+        v1_12WorldUtils.serialize(world);
+        System.out.println("SERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
+
+    }
+
+    @Test
+    public void asdf2() throws IOException, CorruptedWorldException, NewerFormatException{
+        RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");
+        byte[] bytes = new byte[(int)file.length()];
+        file.readFully(bytes);
+
+        WorldLoader loader = new ManyWorldLoader(null);
+
+        PreparedWorld pw = this.getPreparedWorld();
+
+        long now = System.currentTimeMillis();
+
+        System.out.println("---------------------------------------------------------------------");
         ManyWorld world = loader.deserialize(pw);
         //Assert.assertNotNull(world.getWorldInfo());
         //Assert.assertNotNull(world.getMetadata());
@@ -107,20 +136,9 @@ public class WorldDatabaseTest {
         now = System.currentTimeMillis();
         pw = loader.serialize(world);
         System.out.println("SERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
-
-        now = System.currentTimeMillis();
-        WorldBuffer buffer = new WorldBuffer();
-
-        buffer.setName(world.getWorldInfo().getWorldName());
-        buffer.setVersion(SlimeFormat.SLIME_VERSION);
-        buffer.setPropertyMap(world.getMetadata().getProperties().asSlime());
-
-        v1_12WorldUtils.serialize((CraftManyWorld) world);
-        System.out.println("DESERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
-        now = System.currentTimeMillis();
-        v1_12WorldUtils.deserializeWorld(loader, "asdf", pw.getWorldBytes(), pw.getMetadata().getProperties().asSlime(), false);
-        System.out.println("SERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
-
     }
+
+     */
+
 
 }

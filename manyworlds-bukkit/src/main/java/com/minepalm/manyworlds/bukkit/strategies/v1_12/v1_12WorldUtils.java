@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 //todo: 모듈 분리
 public class v1_12WorldUtils {
 
-    public static byte[] serialize(CraftManyWorld world) throws IOException{
+    public static byte[] serialize(CraftSlimeWorld world) throws IOException{
         //헤더 시작
         List<SlimeChunk> sortedChunks;
 

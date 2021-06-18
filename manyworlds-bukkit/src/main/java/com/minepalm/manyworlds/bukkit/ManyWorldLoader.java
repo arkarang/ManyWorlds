@@ -10,6 +10,7 @@ import com.minepalm.manyworlds.bukkit.strategies.v1_12.*;
 import lombok.NonNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +29,6 @@ public class ManyWorldLoader implements WorldLoader {
         strategies.put(LoadPhase.MAP, new WorldMapStrategy());
     }
 
-    //todo: 매우 느린 구조 (기존 대비 6~8배 정도 느림)
     @Override
     public ManyWorld deserialize(@NonNull PreparedWorld world) throws IOException {
         WorldBuffer buffer = new WorldBuffer();
@@ -51,7 +51,6 @@ public class ManyWorldLoader implements WorldLoader {
         return result;
     }
 
-    //todo: 매우 느린 구조 (기존 대비 2배 정도 느림)
     @Override
     public PreparedWorld serialize(@NonNull ManyWorld world) throws IOException{
         WorldBuffer buffer = new WorldBuffer();

@@ -16,21 +16,21 @@ public class WorldChunkStrategy implements WorldStrategy {
     public WorldBuffer serialize(WorldOutputStream stream, WorldBuffer buffer) throws IOException {
 
         List<SlimeChunk> list;
+        Map<Long, SlimeChunk> chunks = buffer.getChunks();
 
         synchronized (buffer.getChunks()) {
-            list = new ArrayList<>(buffer.getChunks().values());
+            list = new ArrayList<>(chunks.values());
         }
 
         buffer.setSortedChunks(list);
-
-        buffer.getSortedChunks().sort(Comparator.comparingLong(chunk -> (long) chunk.getZ() * Integer.MAX_VALUE + (long) chunk.getX()));
-        buffer.getSortedChunks().removeIf(chunk -> chunk == null || Arrays.stream(chunk.getSections()).allMatch(Objects::isNull)); // Remove empty chunks to save space
+        list.sort(Comparator.comparingLong(chunk -> (long) chunk.getZ() * Integer.MAX_VALUE + (long) chunk.getX()));
+        list.removeIf(chunk -> chunk == null || Arrays.stream(chunk.getSections()).allMatch(Objects::isNull)); // Remove empty chunks to save space
 
         // Lowest chunk coordinates
-        int minX = buffer.getSortedChunks().stream().mapToInt(SlimeChunk::getX).min().orElse(0);
-        int minZ = buffer.getSortedChunks().stream().mapToInt(SlimeChunk::getZ).min().orElse(0);
-        int maxX = buffer.getSortedChunks().stream().mapToInt(SlimeChunk::getX).max().orElse(0);
-        int maxZ = buffer.getSortedChunks().stream().mapToInt(SlimeChunk::getZ).max().orElse(0);
+        int minX = list.stream().mapToInt(SlimeChunk::getX).min().orElse(0);
+        int minZ = list.stream().mapToInt(SlimeChunk::getZ).min().orElse(0);
+        int maxX = list.stream().mapToInt(SlimeChunk::getX).max().orElse(0);
+        int maxZ = list.stream().mapToInt(SlimeChunk::getZ).max().orElse(0);
 
         stream.writeShort(minX);
         stream.writeShort(minZ);
@@ -45,7 +45,7 @@ public class WorldChunkStrategy implements WorldStrategy {
         // Chunk Bitmask
         BitSet chunkBitset = new BitSet(width * depth);
 
-        for (SlimeChunk chunk : buffer.getSortedChunks()) {
+        for (SlimeChunk chunk : list) {
             int bitsetIndex = (chunk.getZ() - minZ) * width + (chunk.getX() - minX);
             chunkBitset.set(bitsetIndex, true);
         }
@@ -61,7 +61,7 @@ public class WorldChunkStrategy implements WorldStrategy {
             stream.writeInt(0);
         }
 
-        byte[] chunkData = v1_12WorldUtils.serializeChunks(buffer.getSortedChunks(), buffer.getWorldVersion());
+        byte[] chunkData = v1_12WorldUtils.serializeChunks(list, buffer.getWorldVersion());
         byte[] compressedChunkData = Zstd.compress(chunkData);
 
         stream.writeInt(compressedChunkData.length);
@@ -73,6 +73,7 @@ public class WorldChunkStrategy implements WorldStrategy {
 
     @Override
     public WorldBuffer deserialize(WorldInputStream stream, WorldBuffer buffer) throws IOException{
+
         int minX = stream.readShort();
         int minZ = stream.readShort();
         int width = stream.readShort();
