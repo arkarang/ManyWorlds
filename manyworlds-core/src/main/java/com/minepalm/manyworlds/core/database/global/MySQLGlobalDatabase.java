@@ -1,6 +1,9 @@
 package com.minepalm.manyworlds.core.database.global;
 
-import com.minepalm.manyworlds.api.*;
+import com.minepalm.manyworlds.api.BukkitView;
+import com.minepalm.manyworlds.api.BungeeView;
+import com.minepalm.manyworlds.api.GlobalDatabase;
+import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.core.database.AbstractMySQL;
 import com.minepalm.manyworlds.core.server.BukkitServerView;
@@ -28,18 +31,18 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     public MySQLGlobalDatabase(String proxy, ServerView self, String servers_table, String worlds_table, Properties properties) {
         super(properties);
-        this.serverList = servers_table;
-        this.worldList = worlds_table;
         this.proxyName = proxy;
         this.currentServer = self;
+        this.serverList = servers_table;
+        this.worldList = worlds_table;
         create();
     }
 
     @Override
     protected void create() {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps1 = con.prepareStatement("CREATE IF NOT EXISTS "+serverList+"(`type` VARCHAR(16), `server` VARCHAR (32))");
-            PreparedStatement ps2 = con.prepareStatement("CREATE IF NOT EXISTS "+worldList+"(`proxy` VARCHAR(16), `server` VARCHAR(16), `world_name` VARCHAR (64))");
+            PreparedStatement ps1 = con.prepareStatement("CREATE TABLE IF NOT EXISTS `"+serverList+"` (`id` INT NOT NULL AUTO_INCREMENT, `type` VARCHAR(16), `server` VARCHAR (32) UNIQUE, PRIMARY KEY(`id`, `server`)) charset=utf8mb4");
+            PreparedStatement ps2 = con.prepareStatement("CREATE TABLE IF NOT EXISTS `"+worldList+"` (`id` INT NOT NULL AUTO_INCREMENT, `proxy` VARCHAR(16), `server` VARCHAR(16), `world_name` VARCHAR (64) UNIQUE, PRIMARY KEY(`id`,`world_name`)) charset=utf8mb4");
             ps1.execute();
             ps2.execute();
         }catch (SQLException e){
@@ -66,7 +69,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     @Override
     public ServerView getServer(String name) {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT `name` FROM "+serverList+" WHERE `name`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+serverList+" WHERE `server`=?");
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -98,7 +101,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     public List<BukkitView> getServers() {
         try(Connection con = hikari.getConnection()){
             List<BukkitView> list = new ArrayList<>();
-            PreparedStatement ps = con.prepareStatement("SELECT `name` FROM "+serverList+" WHERE `type`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+serverList+" WHERE `type`=?");
             ps.setString(1, "BUKKIT");
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
@@ -136,7 +139,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     @Override
     public void register() {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("INSERT INTO "+serverList+" VALUES (?, ?) ON DUPLICATE KEY UPDATE `type`=?, `server`=?");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO "+serverList+" (`type`, `server`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `type`=?, `server`=?");
             String type = currentServer instanceof BungeeView ? "BUNGEE" : "BUKKIT";
             ps.setString(1, type);
             ps.setString(2, currentServer.getServerName());
@@ -154,7 +157,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
             PreparedStatement ps = con.prepareStatement("DELETE FROM "+serverList+" WHERE `server`=?");
             PreparedStatement ps2 = con.prepareStatement("DELETE FROM "+worldList+" WHERE `server`=?");
             ps.setString(1, currentServer.getServerName());
-            ps2.setString(2, currentServer.getServerName());
+            ps2.setString(1, currentServer.getServerName());
             ps.execute();
             ps2.execute();
         }catch (SQLException e){
@@ -183,6 +186,17 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
         try (Connection con = hikari.getConnection()){
             PreparedStatement ps = con.prepareStatement("DELETE FROM "+worldList+" WHERE `world_name`=?");
             ps.setString(1, fullName);
+            ps.execute();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void resetWorlds(ServerView view){
+        try (Connection con = hikari.getConnection()){
+            PreparedStatement ps = con.prepareStatement("DELETE FROM "+worldList+" WHERE `server`=?");
+            ps.setString(1, view.getServerName());
             ps.execute();
         }catch (SQLException e){
             e.printStackTrace();

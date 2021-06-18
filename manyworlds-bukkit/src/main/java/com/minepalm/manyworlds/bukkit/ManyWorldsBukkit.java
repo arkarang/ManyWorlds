@@ -1,5 +1,6 @@
 package com.minepalm.manyworlds.bukkit;
 
+import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.nms.SlimeNMS;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.hellobungee.bukkit.HelloBukkit;
@@ -8,9 +9,13 @@ import com.minepalm.manyworlds.api.ManyWorldsCore;
 import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
+import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.ManyWorlds;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
-import com.minepalm.manyworlds.core.netty.*;
+import com.minepalm.manyworlds.core.netty.PacketFactory;
+import com.minepalm.manyworlds.core.netty.PacketResolver;
+import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
+import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +27,6 @@ import java.util.concurrent.Executors;
 public class ManyWorldsBukkit extends JavaPlugin implements WorldManager, ServerView {
 
     private static ExecutorService RESOLVE_SERVICE, EXECUTE_SERVICE;
-    private static final ManyProperties DEFAULT_PROPS = new ManyProperties();
 
     static{
         EXECUTE_SERVICE = Executors.newSingleThreadExecutor();
@@ -45,25 +49,29 @@ public class ManyWorldsBukkit extends JavaPlugin implements WorldManager, Server
     WorldLoader userWorldLoader, sampleWorldLoader;
 
     @Getter
-    WorldStorage worldStorage;
+    static SWMPlugin swm;
 
     @Getter
-    private long launchedTime;
+    WorldStorage worldStorage;
 
     @Override
     public void onEnable() {
         inst = this;
         conf = new Conf(this);
         serverName = conf.getServerName();
-        SlimeNMS nms = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager")).getNms();
+        System.out.println(conf.getServerTable()+", "+conf.getWorldsTable());
+        swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
+        SlimeNMS nms = swm.getNms();
         GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties());
-        core = new ManyWorlds(this.getServerName(), globalDatabase, new BungeeController(HelloBukkit.getConnections()));
+        core = new ManyWorlds(this.getServerName(), globalDatabase, new ProxyController(HelloBukkit.getConnections()));
         userDatabase = new MySQLWorldDatabase(WorldType.USER, conf.getUserTableName(), conf.getDatabaseProperties());
         sampleDatabase = new MySQLWorldDatabase(WorldType.SAMPLE, conf.getSampleTableName(), conf.getDatabaseProperties());
         userWorldLoader = new ManyWorldLoader(userDatabase);
         sampleWorldLoader = new ManyWorldLoader(sampleDatabase);
         worldStorage = new BukkitWorldStorage(nms, 100);
-        launchedTime = System.currentTimeMillis();
+
+        PaperCommandManager manager = new PaperCommandManager(this);
+        manager.registerCommand(new Commands());
 
         PacketListener listener = new PacketListener(this, EXECUTE_SERVICE, new PacketResolver(RESOLVE_SERVICE, core.getGlobalDatabase()));
 
@@ -81,6 +89,7 @@ public class ManyWorldsBukkit extends JavaPlugin implements WorldManager, Server
         Bukkit.getPluginManager().registerEvents(listener, this);
 
         globalDatabase.register();
+        globalDatabase.resetWorlds(this);
         core.getController().send(PacketFactory.newPacket(this, core.getGlobalDatabase().getProxy()).createServerUpdated(true));
     }
 
@@ -115,9 +124,13 @@ public class ManyWorldsBukkit extends JavaPlugin implements WorldManager, Server
 
     @Override
     public void createNewWorld(WorldInfo info) {
-        PreparedWorld preparedWorld = sampleDatabase.prepareWorld(info);
+        WorldInfo swapped = core.newWorldInfo(WorldType.SAMPLE, info.getSampleName(), info.getSampleName());
+        PreparedWorld toUse = sampleDatabase.prepareWorld(swapped);
+        toUse.setWorldInfo(info);
         try {
-            worldStorage.registerWorld(sampleWorldLoader.deserialize(preparedWorld));
+            CraftManyWorld mw = (CraftManyWorld) sampleWorldLoader.deserialize(toUse);
+            mw.setLoader(userWorldLoader);
+            worldStorage.registerWorld(mw);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -144,4 +157,5 @@ public class ManyWorldsBukkit extends JavaPlugin implements WorldManager, Server
         getWorldStorage().unregisterWorld(worldFullName);
         core.getController().send(PacketFactory.newPacket(this, core.getGlobalDatabase().getProxy()).createWorldLoad(worldFullName, false));
     }
+
 }

@@ -1,12 +1,14 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import lombok.Getter;
-
 import java.util.Arrays;
 
+/**
+ * 직렬화 순서 입니다.
+ * 1. HEADER - 슬라임 월드 포멧 헤더입니다.
+ * 2. CHUNK -
+ */
 public enum LoadPhase {
     NONE(-1),
-    ////헤더->청크->타일엔티티->엔티티->엑스트라테그->지도
     HEADER(0),
     CHUNK(1),
     TILE_ENTITY(2),

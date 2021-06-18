@@ -17,13 +17,9 @@ public class WorldCreatePacket extends BasicPacket {
         super(from, to);
         this.sampleName = sampleName;
         this.worldName = worldName;
-    }
-
-    public ByteBuf write(){
-        ByteBuf buf = super.write();
+        ByteBuf buf = super.get();
         buf.writeInt(sampleName.length()).writeCharSequence(sampleName, StandardCharsets.UTF_8);
         buf.writeInt(worldName.length()).writeCharSequence(worldName, StandardCharsets.UTF_8);
-        return buf;
     }
 
     public BukkitView getTargetServer(){

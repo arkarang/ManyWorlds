@@ -97,6 +97,11 @@ public class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase
     }
 
     @Override
+    public void resetWorlds(ServerView view) {
+
+    }
+
+    @Override
     public boolean isWorldLoaded(WorldInfo info) {
         return false;
     }

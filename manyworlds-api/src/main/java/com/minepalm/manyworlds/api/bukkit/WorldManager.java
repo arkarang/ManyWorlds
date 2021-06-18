@@ -1,9 +1,5 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
-
-import java.util.UUID;
-
 public interface WorldManager {
 
     WorldDatabase getWorldDatabase(WorldType type);

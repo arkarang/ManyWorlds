@@ -9,15 +9,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.StandardCharsets;
 
-@RequiredArgsConstructor
 public abstract class BasicPacket extends PacketMessage implements WorldPacket{
     
     static final String NAME = "ManyWorlds";
     
     @Getter
     final ServerView from, to;
-    
-    public ByteBuf write() {
+
+    BasicPacket(ServerView from, ServerView to){
+        this.from = from;
+        this.to = to;
         ByteBuf contexts = super.get();
         contexts.writeInt(NAME.length());
         contexts.writeCharSequence(NAME, StandardCharsets.UTF_8);
@@ -26,9 +27,7 @@ public abstract class BasicPacket extends PacketMessage implements WorldPacket{
         contexts.writeInt(to.getServerName().length());
         contexts.writeCharSequence(to.getServerName(), StandardCharsets.UTF_8);
         contexts.writeByte(getPacketID());
-        return contexts;
+
     }
-
-
     
 }

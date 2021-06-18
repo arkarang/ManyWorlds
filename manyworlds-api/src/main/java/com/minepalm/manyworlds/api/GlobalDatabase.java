@@ -29,6 +29,8 @@ public interface GlobalDatabase {
 
     void unregisterWorld(String serverName, String sampleName, UUID uuid);
 
+    void resetWorlds(ServerView view);
+
     boolean isWorldLoaded(WorldInfo info);
 
     boolean isWorldLoaded(String fullName);

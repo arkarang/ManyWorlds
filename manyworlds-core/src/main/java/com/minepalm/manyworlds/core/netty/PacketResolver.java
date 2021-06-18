@@ -50,10 +50,17 @@ public class PacketResolver {
 
     public Future<? extends WorldPacket> resolve(ByteBuf buf) throws CorruptedPacketException {
         return service.submit(()->{
-            String name = readString(buf);
+            String name;
 
-            if(!name.equals(BasicPacket.NAME))
-                throw new CorruptedPacketException("Header is corrupted! : "+name);
+            try {
+                name = readString(buf);
+
+            }catch (Exception e){
+                throw new CorruptedPacketException("Header is corrupted! ");
+            }
+
+            if (!name.equals(BasicPacket.NAME))
+                throw new CorruptedPacketException("Header is corrupted! : " + name);
 
             String from = readString(buf);
             String to = readString( buf);

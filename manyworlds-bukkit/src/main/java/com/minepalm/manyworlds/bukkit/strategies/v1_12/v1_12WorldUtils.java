@@ -11,23 +11,11 @@ import com.grinderwolf.swm.api.utils.NibbleArray;
 import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.SlimeChunkSection;
-import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.grinderwolf.swm.nms.CraftSlimeChunk;
 import com.grinderwolf.swm.nms.CraftSlimeChunkSection;
 import com.grinderwolf.swm.nms.CraftSlimeWorld;
-import com.grinderwolf.swm.nms.v1_12_R1.CustomDataManager;
-import com.grinderwolf.swm.nms.v1_12_R1.CustomWorldServer;
 import com.minepalm.manyworlds.bukkit.CraftManyWorld;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_12_R1.MinecraftServer;
-import net.minecraft.server.v1_12_R1.WorldServer;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -38,7 +26,7 @@ import java.util.stream.Collectors;
 //todo: 모듈 분리
 public class v1_12WorldUtils {
 
-    public byte[] serialize(CraftManyWorld world) throws IOException{
+    public static byte[] serialize(CraftManyWorld world) throws IOException{
         //헤더 시작
         List<SlimeChunk> sortedChunks;
 
@@ -480,9 +468,7 @@ public class v1_12WorldUtils {
     }
 
     static Map<Long, SlimeChunk> readChunks(byte worldVersion, int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
-        //DataInputStream dataStream = new DataInputStream(new ByteArrayInputStream(chunkData));
-
-        ByteBuf dataStream = Unpooled.directBuffer();
+        DataInputStream dataStream = new DataInputStream(new ByteArrayInputStream(chunkData));
         Map<Long, SlimeChunk> chunkMap = new HashMap<>();
 
         for (int z = 0; z < depth; z++) {
@@ -496,7 +482,7 @@ public class v1_12WorldUtils {
                     if (worldVersion >= 0x04) {
                         int heightMapsLength = dataStream.readInt();
                         byte[] heightMapsArray = new byte[heightMapsLength];
-                        dataStream.readBytes(heightMapsArray);
+                        dataStream.read(heightMapsArray);
                         heightMaps = readCompoundTag(heightMapsArray);
 
                         // Height Maps might be null if empty
@@ -533,7 +519,7 @@ public class v1_12WorldUtils {
                         }
                     } else {
                         byte[] byteBiomes = new byte[256];
-                        dataStream.readBytes(byteBiomes);
+                        dataStream.read(byteBiomes);
                         biomes = toIntArray(byteBiomes);
                     }
 
@@ -558,10 +544,10 @@ public class v1_12WorldUtils {
         return ret;
     }
 
-    private static SlimeChunkSection[] readChunkSections(ByteBuf dataStream, byte worldVersion, int version) throws IOException {
+    private static SlimeChunkSection[] readChunkSections(DataInputStream dataStream, byte worldVersion, int version) throws IOException {
         SlimeChunkSection[] chunkSectionArray = new SlimeChunkSection[16];
         byte[] sectionBitmask = new byte[2];
-        dataStream.readBytes(sectionBitmask);
+        dataStream.read(sectionBitmask);
         BitSet sectionBitset = BitSet.valueOf(sectionBitmask);
 
         for (int i = 0; i < 16; i++) {
@@ -571,7 +557,7 @@ public class v1_12WorldUtils {
 
                 if (version < 5 || dataStream.readBoolean()) {
                     byte[] blockLightByteArray = new byte[2048];
-                    dataStream.readBytes(blockLightByteArray);
+                    dataStream.read(blockLightByteArray);
                     blockLightArray = new NibbleArray((blockLightByteArray));
                 } else {
                     blockLightArray = null;
@@ -593,7 +579,7 @@ public class v1_12WorldUtils {
                     for (int index = 0; index < paletteLength; index++) {
                         int tagLength = dataStream.readInt();
                         byte[] serializedTag = new byte[tagLength];
-                        dataStream.readBytes(serializedTag);
+                        dataStream.read(serializedTag);
 
                         paletteList.add(readCompoundTag(serializedTag));
                     }
@@ -612,11 +598,11 @@ public class v1_12WorldUtils {
                     dataArray = null;
                 } else {
                     blockArray = new byte[4096];
-                    dataStream.readBytes(blockArray);
+                    dataStream.read(blockArray);
 
                     // Block Data Nibble Array
                     byte[] dataByteArray = new byte[2048];
-                    dataStream.readBytes(dataByteArray);
+                    dataStream.read(dataByteArray);
                     dataArray = new NibbleArray((dataByteArray));
 
                     paletteTag = null;
@@ -628,7 +614,7 @@ public class v1_12WorldUtils {
 
                 if (version < 5 || dataStream.readBoolean()) {
                     byte[] skyLightByteArray = new byte[2048];
-                    dataStream.readBytes(skyLightByteArray);
+                    dataStream.read(skyLightByteArray);
                     skyLightArray = new NibbleArray((skyLightByteArray));
                 } else {
                     skyLightArray = null;

@@ -1,7 +1,6 @@
 package com.minepalm.manyworlds.bukkit;
 
 import com.minepalm.arkarangutils.bukkit.SimpleConfig;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Properties;
 
@@ -21,6 +20,15 @@ public class Conf extends SimpleConfig {
         return props;
     }
 
+    //*
+    // HelloBungee: 'proxy'
+    //ServerName: 'server1'
+    //Global:
+    //  Servers: '`manyworlds_servers`'
+    //  Worlds: '`manyworlds_worlds`'
+    //UserTableName: '`manyworlds_world_data`'
+    //SampleTableName: '`manyworlds_samples`'
+    //
     public String getServerName(){
         return config.getString("ServerName");
     }
@@ -34,11 +42,11 @@ public class Conf extends SimpleConfig {
     }
 
     public String getUserTableName(){
-        return config.getString("UserTableName");
+        return config.getString("WorldDatabase.USER");
     }
 
     public String getSampleTableName(){
-        return config.getString("SampleTableName");
+        return config.getString("WorldDatabase.SAMPLE");
     }
 
     public String proxyName(){

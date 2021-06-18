@@ -1,21 +1,30 @@
 package com.minepalm.manyworlds.bukkit.strategies.v1_12;
 
 import com.github.luben.zstd.Zstd;
-import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.SlimeChunkSection;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
+import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 
 import java.io.IOException;
-import java.util.BitSet;
-import java.util.Map;
+import java.util.*;
 
 public class WorldChunkStrategy implements WorldStrategy {
     @Override
     public WorldBuffer serialize(WorldOutputStream stream, WorldBuffer buffer) throws IOException {
+
+        List<SlimeChunk> list;
+
+        synchronized (buffer.getChunks()) {
+            list = new ArrayList<>(buffer.getChunks().values());
+        }
+
+        buffer.setSortedChunks(list);
+
+        buffer.getSortedChunks().sort(Comparator.comparingLong(chunk -> (long) chunk.getZ() * Integer.MAX_VALUE + (long) chunk.getX()));
+        buffer.getSortedChunks().removeIf(chunk -> chunk == null || Arrays.stream(chunk.getSections()).allMatch(Objects::isNull)); // Remove empty chunks to save space
 
         // Lowest chunk coordinates
         int minX = buffer.getSortedChunks().stream().mapToInt(SlimeChunk::getX).min().orElse(0);
@@ -52,7 +61,7 @@ public class WorldChunkStrategy implements WorldStrategy {
             stream.writeInt(0);
         }
 
-        byte[] chunkData = v1_12WorldUtils.serializeChunks(buffer.getSortedChunks(), buffer.getVersion());
+        byte[] chunkData = v1_12WorldUtils.serializeChunks(buffer.getSortedChunks(), buffer.getWorldVersion());
         byte[] compressedChunkData = Zstd.compress(chunkData);
 
         stream.writeInt(compressedChunkData.length);
@@ -63,14 +72,14 @@ public class WorldChunkStrategy implements WorldStrategy {
     }
 
     @Override
-    public WorldBuffer deserialize(WorldInputStream stream, WorldBuffer buffer) throws IOException {
-        short minX = stream.readShort();
-        short minZ = stream.readShort();
+    public WorldBuffer deserialize(WorldInputStream stream, WorldBuffer buffer) throws IOException{
+        int minX = stream.readShort();
+        int minZ = stream.readShort();
         int width = stream.readShort();
         int depth = stream.readShort();
 
         if (width <= 0 || depth <= 0) {
-            //throw new CorruptedWorldException(buffer.getName());
+            throw new IllegalStateException("illegal size: width: "+width+" depth: "+depth);
         }
 
         int bitmaskSize = (int) Math.ceil((width * depth) / 8.0D);
@@ -101,6 +110,8 @@ public class WorldChunkStrategy implements WorldStrategy {
                 }
             }
         }
+
+        buffer.setChunks(chunks);
 
         return buffer;
     }

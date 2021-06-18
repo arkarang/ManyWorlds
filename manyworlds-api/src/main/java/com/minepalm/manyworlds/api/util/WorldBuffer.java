@@ -4,7 +4,6 @@ import com.flowpowered.nbt.CompoundTag;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 

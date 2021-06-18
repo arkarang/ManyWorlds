@@ -11,13 +11,15 @@ public class PacketFactory {
     final ServerView to;
 
     public WorldLoadPacket createWorldLoad(String worldName, boolean loadOrUnload){
-        return new WorldLoadPacket(from, to, worldName, loadOrUnload);
+        WorldLoadPacket packet = new WorldLoadPacket(from, to, worldName, loadOrUnload);
+        return packet;
     }
 
     public WorldCreatePacket createWorldCreate(String sampleName, String worldName){
-        if(to instanceof BukkitView)
-            return new WorldCreatePacket(from, (BukkitView) to, sampleName, worldName);
-        else
+        if(to instanceof BukkitView) {
+            WorldCreatePacket packet = new WorldCreatePacket(from, (BukkitView) to, sampleName, worldName);
+            return packet;
+        }else
             throw new IllegalStateException("Target server must be Bukkit");
     }
 

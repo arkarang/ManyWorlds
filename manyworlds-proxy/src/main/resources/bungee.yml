@@ -1,0 +1,5 @@
+main: com.minepalm.manyworlds.bungee.ManyWorldsBungee
+name: ManyWorldsBungee
+version: 1.0.0
+author: arkarang
+depends: [HelloBungee]

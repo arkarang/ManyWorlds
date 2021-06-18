@@ -16,14 +16,9 @@ public class WorldLoadPacket extends BasicPacket{
         super(from, to);
         this.worldName = worldName;
         this.load = load;
-    }
-
-    @Override
-    public ByteBuf write() {
-        ByteBuf buf = super.write();
+        ByteBuf buf = super.get();
         buf.writeInt(worldName.length()).writeCharSequence(worldName, StandardCharsets.UTF_8);
         buf.writeBoolean(load);
-        return buf;
     }
 
     public byte getPacketID() {

@@ -15,15 +15,13 @@ public abstract class AbstractMySQL{
             String address = properties.getProperty("address");
             String port = properties.getProperty("port");
             String database = properties.getProperty("database");
-            String username = properties.getProperty("user");
+            String username = properties.getProperty("username");
             String password = properties.getProperty("password");
 
-            hikariConfig.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database + "?useSSL=false&autoReconnect=true&characterEncoding=utf8");
-            hikariConfig.addDataSourceProperty("serverName", address);
-            hikariConfig.addDataSourceProperty("port", port);
-            hikariConfig.addDataSourceProperty("databaseName", database);
-            hikariConfig.addDataSourceProperty("user", username);
-            hikariConfig.addDataSourceProperty("password", password);
+            hikariConfig.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database + "?autoReconnect=true&allowMultiQueries=true");
+            hikariConfig.setUsername(username);
+            hikariConfig.setPassword(password);
+
             hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
             hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
             hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

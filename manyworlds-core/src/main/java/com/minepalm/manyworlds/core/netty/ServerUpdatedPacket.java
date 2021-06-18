@@ -12,11 +12,7 @@ public class ServerUpdatedPacket extends BasicPacket{
     ServerUpdatedPacket(ServerView from, ServerView to, boolean online) {
         super(from, to);
         this.online = online;
-    }
-
-    @Override
-    public ByteBuf write() {
-        return super.write().writeBoolean(online);
+        this.get().writeBoolean(online);
     }
 
     public byte getPacketID() {

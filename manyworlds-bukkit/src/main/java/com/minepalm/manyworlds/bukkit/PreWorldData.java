@@ -1,19 +1,23 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.minepalm.manyworlds.api.bukkit.PreparedWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.core.JsonWorldMetadata;
+import com.minepalm.manyworlds.api.bukkit.WorldMetadata;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class PreWorldData implements PreparedWorld {
 
-    final WorldInfo worldInfo;
+    @Setter
+    WorldInfo worldInfo;
+
     final byte[] worldBytes;
-    final JsonWorldMetadata metadata;
-    final SlimePropertyMap properties;
+
+    @Setter
+    WorldMetadata metadata;
 
 }

@@ -2,7 +2,10 @@ package com.minepalm.manyworlds.core;
 
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @EqualsAndHashCode(exclude = "lastUpdated")
 @RequiredArgsConstructor

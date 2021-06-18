@@ -1,5 +1,5 @@
-main: com.minepalm.manyworlds.bukkit.lagacy.ManyWorldPlugin
+main: com.minepalm.manyworlds.bukkit.ManyWorldsBukkit
 name: ManyWorlds
 version: 1.0.0
 author: Arkarang
-depend: [SlimeWorldManager]
+depend: [SlimeWorldManager, HelloBukkit]

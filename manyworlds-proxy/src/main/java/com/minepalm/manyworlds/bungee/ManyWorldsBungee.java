@@ -2,14 +2,13 @@ package com.minepalm.manyworlds.bungee;
 
 import com.minepalm.hellobungee.bungee.HelloBungee;
 import com.minepalm.manyworlds.api.*;
-import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.core.ManyWorlds;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;

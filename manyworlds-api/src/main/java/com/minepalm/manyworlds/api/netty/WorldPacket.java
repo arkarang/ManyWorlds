@@ -10,7 +10,5 @@ public interface WorldPacket extends HelloMessage {
 
     ServerView getTo();
 
-    ByteBuf write();
-
     byte getPacketID();
 }

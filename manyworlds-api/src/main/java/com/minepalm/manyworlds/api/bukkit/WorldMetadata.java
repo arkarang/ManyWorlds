@@ -1,8 +1,10 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import com.minepalm.manyworlds.api.WorldProperties;
 
 public interface WorldMetadata {
 
-    SlimePropertyMap getProperties();
+    <T> T getData(String name, Class<T> clazz);
+
+    WorldProperties getProperties();
 }

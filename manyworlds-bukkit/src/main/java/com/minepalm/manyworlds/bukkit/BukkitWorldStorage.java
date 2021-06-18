@@ -69,6 +69,7 @@ public class BukkitWorldStorage implements WorldStorage {
     public void registerWorld(ManyWorld world) {
         if(world instanceof CraftManyWorld) {
             Bukkit.getScheduler().runTask(ManyWorldsBukkit.getInst(), ()->{
+                worlds.put(world.getName(), world);
                 SERVICE.submit(()->nms.generateWorld(world));
             });
         }
@@ -76,9 +77,24 @@ public class BukkitWorldStorage implements WorldStorage {
 
     @Override
     public ManyWorld unregisterWorld(String str) {
+        ManyWorld mw = worlds.get(str);
+        if(mw != null) {
+            Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
+            world.ifPresent(w -> Bukkit.unloadWorld(w, true));
+        }
+        return mw;
+    }
+
+    //todo: SlimeLoader 의존성 삭제 후 이 메서드 제거.
+    ManyWorld remove(String str){
         ManyWorld mw = worlds.remove(str);
-        Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
-        world.ifPresent(w->Bukkit.unloadWorld(w, true));
+        if(mw != null) {
+            Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
+            world.ifPresent(w -> Bukkit.unloadWorld(w, true));
+            System.out.println("NULL 아님!");
+        }else{
+            System.out.println("NULL 임!");
+        }
         return mw;
     }
 

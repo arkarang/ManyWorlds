@@ -2,10 +2,9 @@ package com.minepalm.manyworlds.bukkit.strategies.v1_12;
 
 import com.flowpowered.nbt.*;
 import com.github.luben.zstd.Zstd;
-import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
 import com.grinderwolf.swm.api.world.SlimeChunk;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
+import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 
@@ -57,7 +56,7 @@ public class WorldTileEntityStrategy implements WorldStrategy {
                 if (chunk != null) {
                     chunk.getTileEntities().add(tileEntityCompound);
                 }else{
-                    //throw new CorruptedWorldException(worldName);
+                    throw new IllegalStateException("chunk is null");
                 }
             }
         }

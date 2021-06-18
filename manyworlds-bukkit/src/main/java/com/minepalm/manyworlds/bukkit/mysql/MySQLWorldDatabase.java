@@ -5,11 +5,10 @@ import com.minepalm.manyworlds.api.bukkit.PreparedWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
-import com.minepalm.manyworlds.bukkit.ManyWorldsBukkit;
-import com.minepalm.manyworlds.core.ManyWorldInfo;
-import com.minepalm.manyworlds.bukkit.ManyProperties;
 import com.minepalm.manyworlds.bukkit.PreWorldData;
+import com.minepalm.manyworlds.bukkit.errors.WorldNotExistsException;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
+import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.database.AbstractMySQL;
 
 import java.sql.Connection;
@@ -17,8 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.UUID;
 
+//todo: 반환값 전부 Future 로 바꾸기
 public class MySQLWorldDatabase extends AbstractMySQL implements WorldDatabase {
 
     final WorldType type;
@@ -34,7 +33,7 @@ public class MySQLWorldDatabase extends AbstractMySQL implements WorldDatabase {
     @Override
     protected void create() {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" (`id` INT NOT NULL AUTO_INCREMENT, `sample` VARCHAR(64), `name` VARCHAR(64), `data` MEDIUMBLOB,  `properties` TEXT, `metadata` TEXT, `last_used` LONG, PRIMARY KEY (`name`)) charset=utf8mb4");
+            PreparedStatement ps = con.prepareStatement("CREATE TABLE IF NOT EXISTS "+table+" (`id` INT NOT NULL AUTO_INCREMENT, `sample` VARCHAR(64), `name` VARCHAR(64) UNIQUE, `data` MEDIUMBLOB, `metadata` TEXT, `last_used` LONG, PRIMARY KEY (`id`, `name`)) charset=utf8mb4");
             ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
@@ -43,9 +42,9 @@ public class MySQLWorldDatabase extends AbstractMySQL implements WorldDatabase {
 
     @Override
     public PreparedWorld prepareWorld(WorldInfo info){
-        if(info.getWorldType().equals(WorldType.USER)) {
+        if(info.getWorldType().equals(type)) {
             try (Connection con = hikari.getConnection()) {
-                PreparedStatement ps = con.prepareStatement("SELECT `data`, `properties`, `metadata` FROM " + table + " WHERE `name`=?");
+                PreparedStatement ps = con.prepareStatement("SELECT `data`, `metadata` FROM " + table + " WHERE `name`=?");
                 ps.setString(1, info.getWorldName());
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -55,27 +54,29 @@ public class MySQLWorldDatabase extends AbstractMySQL implements WorldDatabase {
                     }catch (JsonProcessingException e){
                         metadata = new JsonWorldMetadata();
                     }
-                    return new PreWorldData(info.clone(), rs.getBytes(1), metadata, ManyProperties.fromString(rs.getString(3)).asSlime());
+                    return new PreWorldData(info.clone(), rs.getBytes(1), metadata);
+                }else{
+                    throw new WorldNotExistsException("world does not exists: "+info.getWorldName());
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             return null;
         }else
-            throw new IllegalStateException("Cannot load this world type. Required: "+WorldType.USER+", Input: "+info.getWorldType());
+            throw new IllegalStateException("Cannot load this world type. Required: "+type+", Input: "+info.getWorldType());
     }
+
 
     @Override
     public void saveWorld(PreparedWorld world){
         if(world.getWorldInfo().getWorldType().equals(this.type)) {
             try(Connection con = hikari.getConnection()){
-                PreparedStatement ps = con.prepareStatement("INSERT INTO "+table+" (`sample`, `name`, `bytes`, `properties`, `metadata`) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `bytes`=?, `properties`=?, `metadata`=?");
+                PreparedStatement ps = con.prepareStatement("INSERT INTO "+table+" (`sample`, `name`, `data`, `metadata`) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE `data`=?, `metadata`=?");
                 ps.setString(1, world.getWorldInfo().getSampleName());
                 ps.setString(2, world.getWorldInfo().getWorldName());
                 for(int i = 0 ; i < 2; i++) {
-                    ps.setBytes(3+i*3, world.getWorldBytes());
-                    ps.setString(4+i*3, world.getProperties().toString());
-                    ps.setString(5+i*3, world.getMetadata().toString());
+                    ps.setBytes(3+i*2, world.getWorldBytes());
+                    ps.setString(4+i*2, world.getMetadata().toString());
                 }
                 ps.execute();
             }catch (SQLException e){

@@ -1,7 +1,5 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import java.util.UUID;
-
 public interface WorldDatabase {
 
     PreparedWorld prepareWorld(WorldInfo info);

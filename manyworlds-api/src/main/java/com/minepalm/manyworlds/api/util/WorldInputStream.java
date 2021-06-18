@@ -1,35 +1,35 @@
 package com.minepalm.manyworlds.api.util;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class WorldInputStream extends WorldStream{
-    public WorldInputStream(ByteBuf buffer) {
-        super(buffer);
-    }
+
+    DataInputStream buffer;
 
     public WorldInputStream(byte[] bytes){
-        super(Unpooled.directBuffer().readBytes(bytes));
+        buffer = new DataInputStream(new ByteArrayInputStream(bytes));
     }
 
-    public byte[] read(byte[] toWrite){
-        buffer.readBytes(toWrite);
+    public byte[] read(byte[] toWrite) throws IOException {
+        buffer.read(toWrite);
         return toWrite;
     }
 
-    public int readInt(){
+    public int readInt() throws IOException {
         return buffer.readInt();
     }
 
-    public byte readByte(){
+    public byte readByte() throws IOException {
         return buffer.readByte();
     }
 
-    public short readShort(){
+    public short readShort() throws IOException {
         return buffer.readShort();
     }
 
-    public boolean readBoolean(){
+    public boolean readBoolean() throws IOException {
         return buffer.readBoolean();
     }
 }

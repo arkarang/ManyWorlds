@@ -1,34 +1,42 @@
 package com.minepalm.manyworlds.api.util;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class WorldOutputStream extends WorldStream{
-    public WorldOutputStream(ByteBuf buffer) {
-        super(buffer);
+
+    ByteArrayOutputStream bytes;
+    DataOutputStream buffer;
+
+    public WorldOutputStream() {
+        bytes = new ByteArrayOutputStream();
+        buffer = new DataOutputStream(bytes);
     }
 
-    public WorldOutputStream(byte[] bytes){
-        super(Unpooled.directBuffer().readBytes(bytes));
+
+    public void writeBytes(byte[] bytes) throws IOException {
+        buffer.write(bytes);
     }
 
-    public void writeBytes(byte[] bytes){
-        buffer.writeBytes(bytes);
-    }
-
-    public void writeInt(int i){
+    public void writeInt(int i) throws IOException {
         buffer.writeInt(i);
     }
 
-    public void writeBoolean(boolean b){
+    public void writeBoolean(boolean b) throws IOException {
         buffer.writeBoolean(b);
     }
 
-    public void writeByte(byte b){
+    public void writeByte(byte b) throws IOException {
         buffer.writeByte(b);
     }
 
-    public void writeShort(int s){
+    public void writeShort(int s) throws IOException {
         buffer.writeShort(s);
+    }
+
+    public byte[] get(){
+        return bytes.toByteArray();
     }
 }
