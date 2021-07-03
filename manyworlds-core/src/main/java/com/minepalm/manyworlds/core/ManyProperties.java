@@ -37,7 +37,6 @@ public class ManyProperties implements WorldProperties {
     @JsonProperty("DIFFICULTY")
     String difficulty = "normal";
 
-
     public ManyProperties(){
 
     }

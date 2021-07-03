@@ -17,6 +17,7 @@ public class JsonWorldMetadata implements WorldMetadata {
     public static JsonWorldMetadata fromJson(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, JsonWorldMetadata.class);
+
     }
 
     @Override
