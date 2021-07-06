@@ -8,9 +8,9 @@ import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 import com.minepalm.manyworlds.bukkit.strategies.v1_12.*;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,11 +81,12 @@ public class ManyWorldLoader implements WorldLoader {
         return preparedWorld;
     }
 
+    @SneakyThrows
     @Override
-    public byte[] loadWorld(String s, boolean b) throws UnknownWorldException {
-        WorldInfo info = database.getWorldInfo(s);
+    public byte[] loadWorld(String s, boolean b){
+        WorldInfo info = database.getWorldInfo(s).get();
         if(info != null)
-            return database.prepareWorld(info).getWorldBytes();
+            return database.prepareWorld(info).get().getWorldBytes();
         else
             throw new UnknownWorldException(s);
     }
@@ -102,7 +103,7 @@ public class ManyWorldLoader implements WorldLoader {
 
     @Override
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
-        BukkitWorldStorage storage = (BukkitWorldStorage)ManyWorldsBukkit.getInst().getWorldStorage();
+        ManyWorldStorage storage = (ManyWorldStorage)ManyWorldsBukkit.getInst().getWorldStorage();
         ManyWorld world = storage.remove(s);
         PreparedWorld pw = serialize(world);
         database.saveWorld(pw);
@@ -110,7 +111,7 @@ public class ManyWorldLoader implements WorldLoader {
 
     @Override
     public void unlockWorld(String s) throws UnknownWorldException, IOException {
-        //Nothing.
+        //Do nothing.
     }
 
     @Override

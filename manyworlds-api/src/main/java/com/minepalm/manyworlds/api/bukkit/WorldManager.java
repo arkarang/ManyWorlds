@@ -1,5 +1,7 @@
 package com.minepalm.manyworlds.api.bukkit;
 
+import java.util.concurrent.Future;
+
 public interface WorldManager {
 
     WorldDatabase getWorldDatabase(WorldType type);
@@ -8,12 +10,12 @@ public interface WorldManager {
 
     WorldLoader getWorldLoader(WorldType type);
 
-    void createNewWorld(WorldInfo info);
+    Future<Void> createNewWorld(WorldInfo info);
 
-    void loadWorld(WorldInfo info);
+    Future<Void>  loadWorld(WorldInfo info);
 
-    void save(WorldInfo info);
+    Future<Void>  save(WorldInfo info);
 
-    void save(String worldFullName);
+    Future<Void>  save(String worldFullName);
 
 }

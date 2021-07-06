@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class WorldDatabaseTest {
@@ -38,7 +40,7 @@ public class WorldDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "M!nso0*o");
-        db = new MySQLWorldDatabase(WorldType.SAMPLE, "manyworlds_world_data", props);
+        db = new MySQLWorldDatabase(WorldType.SAMPLE, "manyworlds_world_data", props, Executors.newSingleThreadExecutor());
     }
 
     @Test
@@ -84,9 +86,9 @@ public class WorldDatabaseTest {
     }
 
     @Test
-    public void test_03_loadTest(){
+    public void test_03_loadTest() throws ExecutionException, InterruptedException {
         info = new ManyWorldInfo(WorldType.SAMPLE, "test", "test", 0L);
-        PreparedWorld world = db.prepareWorld(info);
+        PreparedWorld world = db.prepareWorld(info).get();
         Assert.assertNotNull(world);
     }
 

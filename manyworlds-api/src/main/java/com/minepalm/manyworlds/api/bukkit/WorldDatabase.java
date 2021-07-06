@@ -1,16 +1,18 @@
 package com.minepalm.manyworlds.api.bukkit;
 
+import java.util.concurrent.Future;
+
 public interface WorldDatabase {
 
-    PreparedWorld prepareWorld(WorldInfo info);
+    Future<PreparedWorld> prepareWorld(WorldInfo info);
 
-    void saveWorld(PreparedWorld world);
+    Future<Void> saveWorld(PreparedWorld world);
 
-    WorldInfo getWorldInfo(String fullName);
+    Future<WorldInfo> getWorldInfo(String fullName);
 
-    void deleteWorld(WorldInfo info);
+    Future<Void> deleteWorld(WorldInfo info);
 
-    void deleteWorld(String fullName);
+    Future<Void> deleteWorld(String fullName);
 
 
 }

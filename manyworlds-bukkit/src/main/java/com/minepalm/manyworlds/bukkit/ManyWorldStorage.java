@@ -22,7 +22,7 @@ todo:
 
  */
 @RequiredArgsConstructor
-public class BukkitWorldStorage implements WorldStorage {
+public class ManyWorldStorage implements WorldStorage {
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
     private static volatile HashMap<String, ManyWorld> worlds = new HashMap<>();
