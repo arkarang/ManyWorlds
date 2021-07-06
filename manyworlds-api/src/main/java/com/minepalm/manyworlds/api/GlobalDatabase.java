@@ -3,6 +3,7 @@ package com.minepalm.manyworlds.api;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface GlobalDatabase {
@@ -34,6 +35,8 @@ public interface GlobalDatabase {
     boolean isWorldLoaded(WorldInfo info);
 
     boolean isWorldLoaded(String fullName);
+
+    Optional<BukkitView> getLoadedServer(WorldInfo info);
 
     boolean isWorldLoaded(String serverName, String sampleName, UUID uuid);
 }

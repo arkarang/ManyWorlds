@@ -6,14 +6,11 @@ import com.minepalm.manyworlds.api.netty.Controller;
 
 public interface ManyWorldsCore {
 
-
     Controller getController();
 
     GlobalDatabase getGlobalDatabase();
 
-    WorldInfo newWorldInfo(WorldType type, String worldName);
-
-    WorldInfo newWorldInfo(WorldType type, String sampleName, String worldName);
-
     long getLaunchedTime();
+
+    void shutdown();
 }

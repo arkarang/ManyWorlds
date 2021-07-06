@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class ManyWorlds implements ManyWorldsCore{
+public abstract class AbstractManyWorlds implements ManyWorldsCore{
 
     final String name;
 
@@ -19,15 +19,5 @@ public class ManyWorlds implements ManyWorldsCore{
     final Controller controller;
 
     final long launchedTime = System.currentTimeMillis();
-
-    @Override
-    public WorldInfo newWorldInfo(WorldType type, String worldName) {
-        return new ManyWorldInfo(type, null, worldName, System.currentTimeMillis());
-    }
-
-    @Override
-    public WorldInfo newWorldInfo(WorldType type, String sampleName, String worldName) {
-        return new ManyWorldInfo(type, sampleName, worldName, System.currentTimeMillis());
-    }
 
 }

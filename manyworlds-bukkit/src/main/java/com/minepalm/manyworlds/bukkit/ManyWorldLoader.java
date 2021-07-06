@@ -16,10 +16,12 @@ import java.util.List;
 
 public class ManyWorldLoader implements WorldLoader {
 
+    final WorldStorage storage;
     final WorldDatabase database;
     final HashMap<LoadPhase, WorldStrategy> strategies = new HashMap<>();
 
-    public ManyWorldLoader(WorldDatabase database){
+    public ManyWorldLoader(WorldDatabase database, WorldStorage storage){
+        this.storage = storage;
         this.database = database;
         strategies.put(LoadPhase.HEADER, new WorldHeaderStrategy());
         strategies.put(LoadPhase.CHUNK, new WorldChunkStrategy());
@@ -98,12 +100,12 @@ public class ManyWorldLoader implements WorldLoader {
 
     @Override
     public List<String> listWorlds() {
-        return ManyWorldsBukkit.getInst().getWorldStorage().getLoadedWorldsAll();
+        return storage.getLoadedWorldsAll();
     }
 
     @Override
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
-        ManyWorldStorage storage = (ManyWorldStorage)ManyWorldsBukkit.getInst().getWorldStorage();
+        ManyWorldStorage storage = (ManyWorldStorage) this.storage;
         ManyWorld world = storage.remove(s);
         PreparedWorld pw = serialize(world);
         database.saveWorld(pw);
@@ -116,7 +118,7 @@ public class ManyWorldLoader implements WorldLoader {
 
     @Override
     public boolean isWorldLocked(String s) throws UnknownWorldException, IOException {
-        return ManyWorldsBukkit.getCore().getGlobalDatabase().isWorldLoaded(s);
+        return ManyWorlds.getCore().getGlobalDatabase().isWorldLoaded(s);
     }
 
     @Override

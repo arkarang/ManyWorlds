@@ -19,7 +19,7 @@ public class CraftManyWorld extends CraftSlimeWorld implements ManyWorld {
     WorldInfo worldInfo;
 
     CraftManyWorld(WorldInfo info, WorldMetadata metadata, WorldBuffer buffer){
-        this(ManyWorldsBukkit.getInst().getWorldLoader(info.getWorldType()), info, metadata, buffer);
+        this(ManyWorlds.getWorldLoader(info.getWorldType()), info, metadata, buffer);
     }
 
     CraftManyWorld(WorldLoader loader, WorldInfo info, WorldMetadata metadata, WorldBuffer buffer){

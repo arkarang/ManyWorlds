@@ -68,7 +68,7 @@ public class ManyWorldStorage implements WorldStorage {
     @Override
     public void registerWorld(ManyWorld world) {
         if(world instanceof CraftManyWorld) {
-            Bukkit.getScheduler().runTask(ManyWorldsBukkit.getInst(), ()->{
+            Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
                 worlds.put(world.getName(), world);
                 SERVICE.submit(()->nms.generateWorld(world));
             });

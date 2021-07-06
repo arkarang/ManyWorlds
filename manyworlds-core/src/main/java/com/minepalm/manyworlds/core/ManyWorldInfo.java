@@ -29,6 +29,14 @@ public class ManyWorldInfo implements WorldInfo {
         this(WorldType.SAMPLE, typeName, typeName, time);
     }
 
+    public ManyWorldInfo(WorldType type, String worldName){
+        this(type, null, worldName, System.currentTimeMillis());
+    }
+
+    public ManyWorldInfo(WorldType type, String sampleName, String worldName){
+        this(type, sampleName, worldName, System.currentTimeMillis());
+    }
+
     @Override
     public WorldInfo clone() {
         return new ManyWorldInfo(worldType, sampleName, worldName, lastUpdated);

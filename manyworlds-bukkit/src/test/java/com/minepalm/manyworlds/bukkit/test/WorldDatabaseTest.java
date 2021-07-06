@@ -49,7 +49,7 @@ public class WorldDatabaseTest {
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
 
-        WorldLoader loader = new ManyWorldLoader(null);
+        WorldLoader loader = new ManyWorldLoader(null, null);
 
         PreparedWorld pw = this.getPreparedWorld();
 

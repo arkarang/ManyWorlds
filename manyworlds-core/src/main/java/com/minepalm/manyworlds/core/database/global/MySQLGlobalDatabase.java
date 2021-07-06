@@ -14,10 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase {
 
@@ -231,6 +228,28 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public Optional<BukkitView> getLoadedServer(WorldInfo info) {
+        BukkitView view = null;
+        String serverName = null;
+
+        try(Connection con = hikari.getConnection()){
+            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+worldList+" WHERE `world_name`=?");
+            ps.setString(1, info.getWorldName());
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                serverName = rs.getString(1);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        if(serverName != null)
+            view = getBukkitServer(serverName);
+
+        return Optional.ofNullable(view);
     }
 
     @Override

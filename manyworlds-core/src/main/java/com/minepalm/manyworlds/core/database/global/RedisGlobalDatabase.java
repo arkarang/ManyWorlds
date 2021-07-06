@@ -11,10 +11,7 @@ import com.minepalm.manyworlds.core.database.AbstractRedis;
 import com.minepalm.manyworlds.core.server.BukkitServerView;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 //todo: 나중으로
 public class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase {
@@ -109,6 +106,11 @@ public class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase
     @Override
     public boolean isWorldLoaded(String fullName) {
         return false;
+    }
+
+    @Override
+    public Optional<BukkitView> getLoadedServer(WorldInfo info) {
+        return Optional.empty();
     }
 
     @Override
