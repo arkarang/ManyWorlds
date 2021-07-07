@@ -6,7 +6,7 @@ import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
 import com.minepalm.manyworlds.bukkit.PreWorldData;
-import com.minepalm.manyworlds.bukkit.errors.WorldNotExistsException;
+import com.minepalm.manyworlds.api.errors.WorldNotExistsException;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.database.AbstractMySQL;
@@ -17,10 +17,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-//todo: 반환값 전부 Future 로 바꾸기
 public class MySQLWorldDatabase extends AbstractMySQL implements WorldDatabase {
 
     private final ExecutorService service;

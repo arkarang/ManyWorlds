@@ -20,7 +20,7 @@ public class MySQLGlobalDatabaseTest {
         props.setProperty("port", "3306");
         props.setProperty("database", "test");
         props.setProperty("username", "root");
-        props.setProperty("password", "M!nso0*o");
+        props.setProperty("password", "test");
         db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props);
     }
 

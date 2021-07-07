@@ -4,18 +4,28 @@ import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.hellobungee.bukkit.HelloBukkit;
 import com.minepalm.hellobungee.bukkit.Listener;
+import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.GlobalDatabase;
 import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
+import com.minepalm.manyworlds.api.netty.WorldPacket;
+import com.minepalm.manyworlds.core.ManyWorldInfo;
+import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
+import com.minepalm.manyworlds.core.netty.PacketFactory;
+import com.minepalm.manyworlds.core.netty.PacketResolver;
+import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
+import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ManyWorlds extends JavaPlugin implements ServerView{
+public class ManyWorlds extends JavaPlugin implements BukkitView {
 
     @Getter
     private static BukkitCore core;
@@ -23,10 +33,10 @@ public class ManyWorlds extends JavaPlugin implements ServerView{
     @Getter
     static ManyWorlds inst;
 
-    @Getter(AccessLevel.PACKAGE)
+    @Getter
     String serverName;
 
-    @Getter(AccessLevel.PACKAGE)
+    @Getter
     private Conf conf;
 
     @Getter(AccessLevel.PACKAGE)
@@ -37,6 +47,7 @@ public class ManyWorlds extends JavaPlugin implements ServerView{
         inst = this;
         conf = new Conf(this);
         swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
+        this.serverName = conf.getServerName();
 
         GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties());
         core = new BukkitCore(this, globalDatabase, new ProxyController(HelloBukkit.getConnections()));
@@ -45,6 +56,7 @@ public class ManyWorlds extends JavaPlugin implements ServerView{
         manager.registerCommand(new Commands());
 
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
+        Bukkit.getPluginManager().registerEvents(core.getListener(), this);
     }
 
     @Override
@@ -64,7 +76,7 @@ public class ManyWorlds extends JavaPlugin implements ServerView{
         return core.getWorldDatabase(type);
     }
 
-    public static WorldLoader getWorldLoader(WorldType type) {
+    public static WorldLoader getWorldLoader(WorldType type) throws LoaderNotFoundException {
         return core.getWorldLoader(type);
     }
 
@@ -82,5 +94,18 @@ public class ManyWorlds extends JavaPlugin implements ServerView{
 
     public static Future<Void> save(String worldFullName) {
         return core.save(worldFullName);
+    }
+
+    public static void send(WorldPacket packet){
+        core.getController().send(packet);
+    }
+
+    public static PacketFactory newPacket(ServerView destination){
+        return PacketFactory.newPacket(inst, destination);
+    }
+
+    @Override
+    public int getLoadedWorlds() {
+        return getWorldStorage().getCounts();
     }
 }

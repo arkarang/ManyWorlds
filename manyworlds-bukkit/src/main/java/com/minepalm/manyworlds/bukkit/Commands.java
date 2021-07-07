@@ -11,10 +11,11 @@ import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.BungeeView;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.api.bukkit.WorldType;
+import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Commands extends BaseCommand {
 
     @Subcommand("전체")
     @Description("네트워크 전체에 로드되어 있는 정보를 봅니다.")
-    public void allInfo(Player player){
+    public void allInfo(CommandSender player){
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()->{
             List<BukkitView> views = ManyWorlds.getGlobalDatabase().getServers();
             for (BukkitView view : views) {
@@ -48,7 +49,7 @@ public class Commands extends BaseCommand {
 
     @Subcommand("번지")
     @Description("번지코드에 할당 되어 있는 정보를 봅니다.")
-    public void bungeeInfo(Player player){
+    public void bungeeInfo(CommandSender player){
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()-> {
             BungeeView view = ManyWorlds.getGlobalDatabase().getProxy();
             player.sendMessage("번지코드: "+view.getServerName());
@@ -58,7 +59,7 @@ public class Commands extends BaseCommand {
 
     @Subcommand("버킷")
     @Description("버킷에 할당되어 있는 정보를 봅니다.")
-    public void bukkitInfo(Player player, @Default("!Self") String name){
+    public void bukkitInfo(CommandSender player, @Default("!Self") String name){
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()-> {
             BukkitView view;
 
@@ -80,7 +81,7 @@ public class Commands extends BaseCommand {
 
     @Subcommand("등록")
     @Description("Slime World Manager 로부터 샘플 월드를 등록합니다.")
-    public void register(Player player, String SWMWorld, String name){
+    public void register(CommandSender player, String SWMWorld, String name){
         SlimeLoader loader = ManyWorlds.getInst().getSwm().getLoader("mysql");
         try {
             byte[] bytes;
@@ -92,8 +93,8 @@ public class Commands extends BaseCommand {
                 return;
             }
 
-            WorldInfo info = new ManyWorldInfo(WorldType.SAMPLE, name, name);
-            ManyWorlds.getWorldDatabase(WorldType.SAMPLE).saveWorld(new PreWorldData(info, bytes, new JsonWorldMetadata()));
+            WorldInfo info = new ManyWorldInfo(WorldTokens.SAMPLE, name, name);
+            ManyWorlds.getWorldDatabase(WorldTokens.SAMPLE).saveWorld(new PreWorldData(info, bytes, new JsonWorldMetadata()));
             player.sendMessage("월드 저장 완료!");
         }catch (UnknownWorldException | IOException e){
             e.printStackTrace();
@@ -103,7 +104,7 @@ public class Commands extends BaseCommand {
     @Subcommand("생성")
     @Description("해당 샘플에 맞는 플레이어 개인 월드를 생성합니다.")
     public void createOwn(Player player, String name){
-        WorldInfo info = new ManyWorldInfo(WorldType.USER, name, name+"_"+player.getUniqueId().toString());
+        WorldInfo info = new ManyWorldInfo(WorldTokens.USER, name, name+"_"+player.getUniqueId().toString());
         ManyWorlds.createNewWorld(info);
         player.sendMessage("월드 생성 완료!");
     }

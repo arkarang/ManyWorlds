@@ -26,11 +26,11 @@ public class ManyWorldInfo implements WorldInfo {
     final long lastUpdated;
 
     public ManyWorldInfo(String typeName, long time){
-        this(WorldType.SAMPLE, typeName, typeName, time);
+        this(WorldTokens.SAMPLE, typeName, typeName, time);
     }
 
     public ManyWorldInfo(WorldType type, String worldName){
-        this(type, null, worldName, System.currentTimeMillis());
+        this(type, "", worldName, System.currentTimeMillis());
     }
 
     public ManyWorldInfo(WorldType type, String sampleName, String worldName){

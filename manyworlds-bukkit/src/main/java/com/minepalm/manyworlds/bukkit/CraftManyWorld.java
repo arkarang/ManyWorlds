@@ -5,6 +5,7 @@ import com.minepalm.manyworlds.api.bukkit.ManyWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldLoader;
 import com.minepalm.manyworlds.api.bukkit.WorldMetadata;
+import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
 import com.minepalm.manyworlds.api.util.WorldBuffer;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class CraftManyWorld extends CraftSlimeWorld implements ManyWorld {
     @Getter
     WorldInfo worldInfo;
 
-    CraftManyWorld(WorldInfo info, WorldMetadata metadata, WorldBuffer buffer){
+    CraftManyWorld(WorldInfo info, WorldMetadata metadata, WorldBuffer buffer) throws LoaderNotFoundException {
         this(ManyWorlds.getWorldLoader(info.getWorldType()), info, metadata, buffer);
     }
 

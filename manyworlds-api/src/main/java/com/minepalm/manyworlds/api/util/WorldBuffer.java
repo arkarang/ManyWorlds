@@ -4,6 +4,7 @@ import com.flowpowered.nbt.CompoundTag;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import com.minepalm.manyworlds.api.bukkit.LoadPhase;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class WorldBuffer {
+
+    LoadPhase phase = LoadPhase.NONE;
 
     byte version = -1;
 

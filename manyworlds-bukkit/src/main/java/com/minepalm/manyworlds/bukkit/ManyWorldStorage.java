@@ -6,6 +6,8 @@ import com.grinderwolf.swm.nms.SlimeNMS;
 import com.minepalm.manyworlds.api.bukkit.ManyWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldStorage;
+import com.minepalm.manyworlds.api.netty.WorldPacket;
+import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -24,7 +26,6 @@ todo:
 @RequiredArgsConstructor
 public class ManyWorldStorage implements WorldStorage {
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
     private static volatile HashMap<String, ManyWorld> worlds = new HashMap<>();
     private static final Multimap<String, String> nameHints = HashMultimap.create();
 
@@ -70,7 +71,8 @@ public class ManyWorldStorage implements WorldStorage {
         if(world instanceof CraftManyWorld) {
             Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
                 worlds.put(world.getName(), world);
-                SERVICE.submit(()->nms.generateWorld(world));
+                nms.generateWorld(world);
+                ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
             });
         }
     }
@@ -85,17 +87,13 @@ public class ManyWorldStorage implements WorldStorage {
         return mw;
     }
 
+    void unregisterWorldFromDatabase(String worldName){
+        ManyWorlds.getGlobalDatabase().unregisterWorld(worldName);
+    }
+
     //todo: SlimeLoader 의존성 삭제 후 이 메서드 제거.
     ManyWorld remove(String str){
-        ManyWorld mw = worlds.remove(str);
-        if(mw != null) {
-            Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
-            world.ifPresent(w -> Bukkit.unloadWorld(w, true));
-            System.out.println("NULL 아님!");
-        }else{
-            System.out.println("NULL 임!");
-        }
-        return mw;
+        return worlds.remove(str);
     }
 
     void unregisterWorld(ManyWorld world){
@@ -111,7 +109,7 @@ public class ManyWorldStorage implements WorldStorage {
 
     @Override
     public void shutdown() {
-        worlds.keySet().forEach(this::unregisterWorld);
+        worlds.keySet().forEach(this::unregisterWorldFromDatabase);
     }
 
     @Override

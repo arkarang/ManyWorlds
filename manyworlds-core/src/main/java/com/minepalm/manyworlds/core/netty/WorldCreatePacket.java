@@ -13,7 +13,7 @@ public class WorldCreatePacket extends BasicPacket {
     String sampleName;
     String worldName;
 
-    WorldCreatePacket(ServerView from, BukkitView to, String sampleName, String worldName) {
+    WorldCreatePacket(ServerView from, ServerView to, String sampleName, String worldName) {
         super(from, to);
         this.sampleName = sampleName;
         this.worldName = worldName;

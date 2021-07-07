@@ -17,8 +17,6 @@ import java.util.concurrent.Future;
 @Getter
 public class ManyWorldsBungee extends Plugin implements BungeeView {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
-
     @Getter
     static ManyWorldsBungee inst;
     @Getter

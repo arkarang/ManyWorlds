@@ -7,8 +7,11 @@ import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 import com.minepalm.manyworlds.bukkit.strategies.v1_12.*;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,9 +19,10 @@ import java.util.List;
 
 public class ManyWorldLoader implements WorldLoader {
 
-    final WorldStorage storage;
-    final WorldDatabase database;
-    final HashMap<LoadPhase, WorldStrategy> strategies = new HashMap<>();
+    @Getter
+    protected final WorldDatabase database;
+    protected final WorldStorage storage;
+    protected final HashMap<LoadPhase, WorldStrategy> strategies = new HashMap<>();
 
     public ManyWorldLoader(WorldDatabase database, WorldStorage storage){
         this.storage = storage;
@@ -42,9 +46,10 @@ public class ManyWorldLoader implements WorldLoader {
         WorldInputStream stream = new WorldInputStream(world.getWorldBytes());
 
         for (int i = LoadPhase.HEADER.number(); i < LoadPhase.END.number(); i++) {
+            buffer.setPhase(LoadPhase.getPhase(i));
             strategies.get(LoadPhase.getPhase(i)).deserialize(stream, buffer);
         }
-
+        buffer.setPhase(LoadPhase.END);
         CraftManyWorld result = new CraftManyWorld(this, world.getWorldInfo(), world.getMetadata(), buffer);
 
         stream.close();
@@ -72,9 +77,10 @@ public class ManyWorldLoader implements WorldLoader {
         WorldOutputStream stream = new WorldOutputStream();
 
         for (int i = LoadPhase.HEADER.number(); i < LoadPhase.END.number(); i++) {
+            buffer.setPhase(LoadPhase.getPhase(i));
             strategies.get(LoadPhase.getPhase(i)).serialize(stream, buffer);
         }
-
+        buffer.setPhase(LoadPhase.END);
         PreparedWorld preparedWorld = new PreWorldData(world.getWorldInfo(), stream.get(), world.getMetadata());
 
         stream.close();
@@ -103,12 +109,16 @@ public class ManyWorldLoader implements WorldLoader {
         return storage.getLoadedWorldsAll();
     }
 
+    // 런타임에서 메인 쓰레드에서 호출될 일이 없어서, 따로 비동기 처리 하지 않아도 됩니다.
+    // 지금 당장은 SWM 의존성과 엮여서 다소 난잡해진 감이 없잖아 있는데,
+    // 나중에 SWM 의존성 제거 할때, 멀티쓰레딩 지원하는 형식대로 교체할 것입니다.
     @Override
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
         ManyWorldStorage storage = (ManyWorldStorage) this.storage;
         ManyWorld world = storage.remove(s);
         PreparedWorld pw = serialize(world);
         database.saveWorld(pw);
+        storage.unregisterWorldFromDatabase(s);
     }
 
     @Override

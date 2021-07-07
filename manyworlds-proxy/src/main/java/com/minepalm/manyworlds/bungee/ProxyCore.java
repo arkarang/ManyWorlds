@@ -11,6 +11,7 @@ import com.minepalm.manyworlds.core.AbstractManyWorlds;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,9 +23,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
 
     @Getter
     static ProxyCore inst = null;
-  
-    @Getter
-    GlobalDatabase database;
+
     ManyWorldsBungee plugin;
 
     public ProxyCore(ManyWorldsBungee plugin, GlobalDatabase globalDatabase, Controller controller) {
@@ -34,12 +33,12 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
         else
             throw new IllegalStateException("ProxyCore already exists");
         this.plugin = plugin;
-        database.register();
+        super.getGlobalDatabase().register();
     }
 
     @Override
     public void shutdown() {
-        database.unregister();
+        super.getGlobalDatabase().unregister();
     }
 
     @Override
@@ -48,10 +47,15 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
             BukkitView least = null;
             int i = 1000;
 
-            for (BukkitView view : database.getServers()) {
+            for (BukkitView view : super.getGlobalDatabase().getServers()) {
+                ProxyServer.getInstance().getLogger().info("view: "+view.getServerName()+": "+view.getLoadedWorlds());
                 least = least == null ? view : least;
-                least = i > view.getLoadedWorlds() ? view : least;
+                if(i > view.getLoadedWorlds()){
+                    least = view;
+                    i = view.getLoadedWorlds();
+                }
                 this.getController().send(PacketFactory.newPacket(plugin, least).createWorldCreate(info.getSampleName(), info.getWorldName()));
+                ProxyServer.getInstance().getLogger().info("least: "+view.getServerName()+": "+view.getLoadedWorlds());
             }
 
             return null;
@@ -64,7 +68,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
             BukkitView least = null;
             int i = 1000;
 
-            for (BukkitView view : database.getServers()) {
+            for (BukkitView view : super.getGlobalDatabase().getServers()) {
                 least = least == null ? view : least;
                 least = i > view.getLoadedWorlds() ? view : least;
                 this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info.getWorldName(), true));

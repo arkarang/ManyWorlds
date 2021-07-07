@@ -165,14 +165,17 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     @Override
     public void registerWorld(BukkitView serverSnapshot, WorldInfo info) {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("INSERT INTO "+worldList+" VALUES(?, ?) ON DUPLICATE KEY UPDATE `SERVER`=?, `world_name`=?");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO "+worldList+" (`proxy`, `server`, `world_name`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `proxy`=?, `server`=?, `world_name`=?");
             String server, name;
             server = serverSnapshot.getServerName();
             name = info.getWorldName();
-            ps.setString(1, server);
-            ps.setString(2, name);
-            ps.setString(3, server);
-            ps.setString(4, name);
+            ps.setString(1, proxyName);
+            ps.setString(2, server);
+            ps.setString(3, name);
+            ps.setString(4, proxyName);
+            ps.setString(5, server);
+            ps.setString(6, name);
+            ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
         }

@@ -20,15 +20,6 @@ public class Conf extends SimpleConfig {
         return props;
     }
 
-    //*
-    // HelloBungee: 'proxy'
-    //ServerName: 'server1'
-    //Global:
-    //  Servers: '`manyworlds_servers`'
-    //  Worlds: '`manyworlds_worlds`'
-    //UserTableName: '`manyworlds_world_data`'
-    //SampleTableName: '`manyworlds_samples`'
-    //
     public String getServerName(){
         return config.getString("ServerName");
     }

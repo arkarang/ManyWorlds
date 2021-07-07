@@ -54,8 +54,8 @@ public class PacketResolver {
 
             try {
                 name = readString(buf);
-
             }catch (Exception e){
+                e.printStackTrace();
                 throw new CorruptedPacketException("Header is corrupted! ");
             }
 

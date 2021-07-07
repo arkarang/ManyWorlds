@@ -13,6 +13,8 @@ import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
 import com.minepalm.manyworlds.bukkit.strategies.v1_12.v1_12WorldUtils;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
+import com.minepalm.manyworlds.core.WorldToken;
+import com.minepalm.manyworlds.core.WorldTokens;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -39,8 +41,8 @@ public class WorldDatabaseTest {
         props.setProperty("port", "3306");
         props.setProperty("database", "test");
         props.setProperty("username", "root");
-        props.setProperty("password", "M!nso0*o");
-        db = new MySQLWorldDatabase(WorldType.SAMPLE, "manyworlds_world_data", props, Executors.newSingleThreadExecutor());
+        props.setProperty("password", "test");
+        db = new MySQLWorldDatabase(WorldTokens.SAMPLE, "manyworlds_world_data", props, Executors.newSingleThreadExecutor());
     }
 
     @Test
@@ -79,7 +81,7 @@ public class WorldDatabaseTest {
     public void test_02_saveTest() throws IOException {
         PreparedWorld pWorld = getPreparedWorld();
         db.saveWorld(pWorld);
-        info = new ManyWorldInfo(WorldType.SAMPLE, "test", "test", 0L);
+        info = new ManyWorldInfo(WorldToken.get("SAMPLE"), "test", "test", 0L);
 
         Assert.assertNotNull(info);
         Assert.assertEquals(info.getWorldName(), pWorld.getWorldInfo().getWorldName());
@@ -87,7 +89,7 @@ public class WorldDatabaseTest {
 
     @Test
     public void test_03_loadTest() throws ExecutionException, InterruptedException {
-        info = new ManyWorldInfo(WorldType.SAMPLE, "test", "test", 0L);
+        info = new ManyWorldInfo(WorldToken.get("SAMPLE"), "test", "test", 0L);
         PreparedWorld world = db.prepareWorld(info).get();
         Assert.assertNotNull(world);
     }

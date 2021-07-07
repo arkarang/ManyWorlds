@@ -61,7 +61,6 @@ public class WorldTileEntityStrategy implements WorldStrategy {
             }
         }
 
-
         return buffer;
     }
 }
