@@ -69,8 +69,8 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
             for (BukkitView view : super.getGlobalDatabase().getServers()) {
                 least = least == null ? view : least;
                 least = i > view.getLoadedWorlds() ? view : least;
-                this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info.getWorldName(), true));
             }
+            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info.getWorldName(), true));
 
             return least;
         });
