@@ -34,14 +34,26 @@ import java.util.List;
 @CommandAlias("월드버킷")
 public class Commands extends BaseCommand {
 
+    @Default
+    @Subcommand("도움말")
+    public void help(CommandSender sender){
+        sender.sendMessage("/월드버킷 도움말 - 도움말을 확인합니다.");
+        sender.sendMessage("/월드버킷 전체 - 네트워크 전체에 로드되어 있는 정보를 봅니다.");
+        sender.sendMessage("/월드버킷 번지 - 이 번지코드에 할당 되어 있는 정보를 봅니다.");
+        sender.sendMessage("/월드버킷 버킷 <버킷명> - 이 버킷에 할당 되어 있는 정보를 봅니다.");
+        sender.sendMessage("/월드버킷 등록 <월드> - 해당 월드를 데이터베이스에 등록합니다.");
+        sender.sendMessage("/월드버킷 생성 <기존월드> <월드명> - 해당 월드를 새로히 생성합니다.");
+        sender.sendMessage("/월드버킷 저장 <월드명> - 로드 되어 있는 월드를 저장하고 언로드합니다.");
+    }
+
     @Subcommand("전체")
     @Description("네트워크 전체에 로드되어 있는 정보를 봅니다.")
-    public void allInfo(CommandSender player){
+    public void allInfo(CommandSender sender){
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()->{
             List<BukkitView> views = ManyWorlds.getGlobalDatabase().getServers();
             for (BukkitView view : views) {
                 for (String loadedWorld : ManyWorlds.getGlobalDatabase().getLoadedWorlds(view.getServerName())) {
-                    player.sendMessage("서버: "+view.getServerName()+" 월드: "+loadedWorld);
+                    sender.sendMessage("서버: "+view.getServerName()+" 월드: "+loadedWorld);
                 }
             }
         });

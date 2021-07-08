@@ -15,7 +15,6 @@ import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
 import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;
 import java.io.IOException;

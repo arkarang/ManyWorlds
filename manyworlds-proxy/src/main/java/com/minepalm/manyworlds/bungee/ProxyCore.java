@@ -1,14 +1,12 @@
 package com.minepalm.manyworlds.bungee;
 
-import com.minepalm.hellobungee.bungee.HelloBungee;
 import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.GlobalDatabase;
-import com.minepalm.manyworlds.api.ManyWorldsCore;
-import com.minepalm.manyworlds.api.WorldLoadBalancer;
+import com.minepalm.manyworlds.api.ServerView;
+import com.minepalm.manyworlds.api.WorldLoadbalancer;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.netty.Controller;
 import com.minepalm.manyworlds.core.AbstractManyWorlds;
-import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
@@ -17,7 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
+public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
@@ -42,7 +40,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
     }
 
     @Override
-    public Future<Void> createAtLeast(WorldInfo info){
+    public Future<ServerView> createAtLeast(WorldInfo info){
         return EXECUTOR_SERVICE.submit(()->{
             BukkitView least = null;
             int i = 1000;
@@ -58,12 +56,12 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
                 ProxyServer.getInstance().getLogger().info("least: "+view.getServerName()+": "+view.getLoadedWorlds());
             }
 
-            return null;
+            return least;
         });
     }
 
     @Override
-    public Future<Void> loadAtLeast(WorldInfo info) {
+    public Future<ServerView> loadAtLeast(WorldInfo info) {
         return EXECUTOR_SERVICE.submit(()->{
             BukkitView least = null;
             int i = 1000;
@@ -74,7 +72,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadBalancer {
                 this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info.getWorldName(), true));
             }
 
-            return null;
+            return least;
         });
     }
 

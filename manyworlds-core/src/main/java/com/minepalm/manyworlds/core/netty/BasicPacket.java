@@ -5,7 +5,6 @@ import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.StandardCharsets;
 

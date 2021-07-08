@@ -46,11 +46,11 @@ public class ManyWorldsBungee extends Plugin implements BungeeView {
         return database.getProxy().getTotalCount();
     }
 
-    public static Future<Void> createAtLeast(WorldInfo info){
+    public static Future<ServerView> createAtLeast(WorldInfo info){
         return core.createAtLeast(info);
     }
 
-    public static Future<Void> loadAtLeast(WorldInfo info) {
+    public static Future<ServerView> loadAtLeast(WorldInfo info) {
         return core.loadAtLeast(info);
     }
 
