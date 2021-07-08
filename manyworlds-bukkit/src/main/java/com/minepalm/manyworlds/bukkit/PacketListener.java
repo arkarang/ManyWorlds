@@ -35,8 +35,8 @@ public class PacketListener implements Listener {
                 Future<? extends WorldPacket> future = resolver.resolve(event.getMessage().get());
                 T packet = (T)future.get();
                 Optional.ofNullable(map.get(packet.getClass())).ifPresent(pe->((PacketExecutor<T>)pe).execute(packet));
-            } catch (InterruptedException | ExecutionException | CorruptedPacketException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException | CorruptedPacketException ignored) {
+                //discard packet
             }
         });
 
