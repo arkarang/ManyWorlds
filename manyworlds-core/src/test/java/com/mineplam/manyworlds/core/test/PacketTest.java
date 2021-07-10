@@ -28,7 +28,7 @@ public class PacketTest {
     @Test
     public void test_02_packetTest() throws CorruptedPacketException, ExecutionException, InterruptedException {
         PacketResolver resolver = new PacketResolver(Executors.newSingleThreadExecutor(), new TestGlobalDatabase());
-        WorldLoadPacket packet = PacketFactory.newPacket(()->"test", ()->"test").createWorldLoad("world", true);
+        WorldLoadPacket packet = PacketFactory.newPacket(()->"test", ()->"test").createWorldLoad("test", "world", true);
         byte[] bytes = packet.serialize();
 
         Future<WorldLoadPacket> future = (Future<WorldLoadPacket>)resolver.resolve(bytes);
