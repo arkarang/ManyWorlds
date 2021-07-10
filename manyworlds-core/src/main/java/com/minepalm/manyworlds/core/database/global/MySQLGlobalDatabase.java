@@ -15,8 +15,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase {
+
+    private final ExecutorService service;
 
     final String serverList;
     final String worldList;
@@ -26,8 +30,9 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     final ServerView currentServer;
 
 
-    public MySQLGlobalDatabase(String proxy, ServerView self, String servers_table, String worlds_table, Properties properties) {
+    public MySQLGlobalDatabase(String proxy, ServerView self, String servers_table, String worlds_table, Properties properties, ExecutorService service) {
         super(properties);
+        this.service = service;
         this.proxyName = proxy;
         this.currentServer = self;
         this.serverList = servers_table;
@@ -64,73 +69,81 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     }
 
     @Override
-    public ServerView getServer(String name) {
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+serverList+" WHERE `server`=?");
-            ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                return () -> name;
+    public Future<ServerView> getServer(String name) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT `server` FROM " + serverList + " WHERE `server`=?");
+                ps.setString(1, name);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return () -> name;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
+            return null;
+        });
     }
 
     @Override
-    public BukkitView getBukkitServer(String name) {
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM "+worldList+" NATURAL JOIN "+serverList+" WHERE `server`=?");
-            ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                int count = rs.getInt(1);
-                return new BukkitServerView(name, count);
+    public Future<BukkitView> getBukkitServer(String name) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM " + worldList + " NATURAL JOIN " + serverList + " WHERE `server`=?");
+                ps.setString(1, name);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return new BukkitServerView(name, count);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
+            return null;
+        });
     }
 
     @Override
-    public List<BukkitView> getServers() {
-        try(Connection con = hikari.getConnection()){
-            List<BukkitView> list = new ArrayList<>();
-            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+serverList+" WHERE `type`=?");
-            ps.setString(1, "BUKKIT");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()){
-                list.add(getBukkitServer(rs.getString(1)));
+    public Future<List<BukkitView>> getServers() {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                List<BukkitView> list = new ArrayList<>();
+                PreparedStatement ps = con.prepareStatement("SELECT `server` FROM " + serverList + " WHERE `type`=?");
+                ps.setString(1, "BUKKIT");
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    list.add(getBukkitServer(rs.getString(1)).get());
+                }
+                return list;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            return list;
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
+            return null;
+        });
     }
 
     @Override
-    public List<String> getLoadedWorlds(String serverName) {
-        try(Connection con = hikari.getConnection()){
-            List<String> list = new ArrayList<>();
-            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM "+worldList+" WHERE `proxy`=?, `server`=?");
+    public Future<List<String>> getLoadedWorlds(String serverName) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                List<String> list = new ArrayList<>();
+                PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `proxy`=?, `server`=?");
 
-            ps.setString(1, proxyName);
-            ps.setString(2, serverName);
+                ps.setString(1, proxyName);
+                ps.setString(2, serverName);
 
-            ResultSet rs = ps.executeQuery();
+                ResultSet rs = ps.executeQuery();
 
-            while (rs.next()){
-                list.add(rs.getString(1));
+                while (rs.next()) {
+                    list.add(rs.getString(1));
+                }
+
+                return list;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-
-            return list;
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
+            return null;
+        });
     }
 
     @Override
@@ -163,109 +176,127 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     }
 
     @Override
-    public void registerWorld(BukkitView serverSnapshot, WorldInfo info) {
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("INSERT INTO "+worldList+" (`proxy`, `server`, `world_name`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `proxy`=?, `server`=?, `world_name`=?");
-            String server, name;
-            server = serverSnapshot.getServerName();
-            name = info.getWorldName();
-            ps.setString(1, proxyName);
-            ps.setString(2, server);
-            ps.setString(3, name);
-            ps.setString(4, proxyName);
-            ps.setString(5, server);
-            ps.setString(6, name);
-            ps.execute();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+    public Future<Void> registerWorld(BukkitView serverSnapshot, WorldInfo info) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("INSERT INTO " + worldList + " (`proxy`, `server`, `world_name`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `proxy`=?, `server`=?, `world_name`=?");
+                String server, name;
+                server = serverSnapshot.getServerName();
+                name = info.getWorldName();
+                ps.setString(1, proxyName);
+                ps.setString(2, server);
+                ps.setString(3, name);
+                ps.setString(4, proxyName);
+                ps.setString(5, server);
+                ps.setString(6, name);
+                ps.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
     @Override
-    public void unregisterWorld(String fullName) {
-        try (Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("DELETE FROM "+worldList+" WHERE `world_name`=?");
-            ps.setString(1, fullName);
-            ps.execute();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+    public Future<Void> unregisterWorld(String fullName) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM " + worldList + " WHERE `world_name`=?");
+                ps.setString(1, fullName);
+                ps.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
     @Override
-    public void resetWorlds(ServerView view){
-        try (Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("DELETE FROM "+worldList+" WHERE `server`=?");
-            ps.setString(1, view.getServerName());
-            ps.execute();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+    public Future<Void> resetWorlds(ServerView view){
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM " + worldList + " WHERE `server`=?");
+                ps.setString(1, view.getServerName());
+                ps.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
     @Override
-    public void unregisterWorld(String serverName, String sampleName, UUID uuid) {
-        try (Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("DELETE FROM "+worldList+" WHERE `server`=?, `world_name`=?");
-            ps.setString(1, serverName);
-            ps.setString(2, sampleName+"_"+uuid);
-            ps.execute();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+    public Future<Void> unregisterWorld(String serverName, String sampleName, UUID uuid) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("DELETE FROM " + worldList + " WHERE `server`=?, `world_name`=?");
+                ps.setString(1, serverName);
+                ps.setString(2, sampleName + "_" + uuid);
+                ps.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
     }
 
     @Override
-    public boolean isWorldLoaded(WorldInfo info) {
+    public Future<Boolean> isWorldLoaded(WorldInfo info) {
         return isWorldLoaded(info.getWorldName());
     }
 
     @Override
-    public boolean isWorldLoaded(String fullName) {
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM "+worldList+" WHERE `world_name`=?");
-            ps.setString(1, fullName);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
-    public Optional<BukkitView> getLoadedServer(WorldInfo info) {
-        BukkitView view = null;
-        String serverName = null;
-
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT `server` FROM "+worldList+" WHERE `world_name`=?");
-            ps.setString(1, info.getWorldName());
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                serverName = rs.getString(1);
+    public Future<Boolean> isWorldLoaded(String fullName) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `world_name`=?");
+                ps.setString(1, fullName);
+                ResultSet rs = ps.executeQuery();
+                return rs.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-
-        if(serverName != null)
-            view = getBukkitServer(serverName);
-
-        return Optional.ofNullable(view);
+            return false;
+        });
     }
 
     @Override
-    public boolean isWorldLoaded(String serverName, String sampleName, UUID uuid) {
-        try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM "+worldList+" WHERE `server`=?, ``world_name`=?");
-            ps.setString(1, serverName);
-            ps.setString(2, sampleName+"_"+uuid);
-            ResultSet rs = ps.executeQuery();
-            return rs.next();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
+    public Future<Optional<BukkitView>> getLoadedServer(WorldInfo info) {
+        return service.submit(()-> {
+            BukkitView view = null;
+            String serverName = null;
+
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT `server` FROM " + worldList + " WHERE `world_name`=?");
+                ps.setString(1, info.getWorldName());
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    serverName = rs.getString(1);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            if (serverName != null)
+                view = getBukkitServer(serverName).get();
+
+            return Optional.ofNullable(view);
+        });
+    }
+
+    @Override
+    public Future<Boolean> isWorldLoaded(String serverName, String sampleName, UUID uuid) {
+        return service.submit(()-> {
+            try (Connection con = hikari.getConnection()) {
+                PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `server`=?, ``world_name`=?");
+                ps.setString(1, serverName);
+                ps.setString(2, sampleName + "_" + uuid);
+                ResultSet rs = ps.executeQuery();
+                return rs.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+        });
     }
 }
