@@ -126,9 +126,10 @@ public class ManyWorldLoader implements WorldLoader {
         //Do nothing.
     }
 
+    @SneakyThrows
     @Override
     public boolean isWorldLocked(String s) throws UnknownWorldException, IOException {
-        return ManyWorlds.getCore().getGlobalDatabase().isWorldLoaded(s);
+        return ManyWorlds.getCore().getGlobalDatabase().isWorldLoaded(s).get();
     }
 
     @Override
