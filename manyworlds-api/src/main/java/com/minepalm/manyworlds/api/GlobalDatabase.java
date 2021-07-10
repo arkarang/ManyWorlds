@@ -5,6 +5,7 @@ import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 public interface GlobalDatabase {
 
@@ -12,31 +13,31 @@ public interface GlobalDatabase {
 
     ServerView getCurrentServer();
 
-    ServerView getServer(String name);
+    Future<ServerView> getServer(String name);
 
-    BukkitView getBukkitServer(String name);
+    Future<BukkitView> getBukkitServer(String name);
 
-    List<BukkitView> getServers();
+    Future<List<BukkitView>> getServers();
 
-    List<String> getLoadedWorlds(String serverName);
+    Future<List<String>> getLoadedWorlds(String serverName);
 
     void register();
 
     void unregister();
 
-    void registerWorld(BukkitView snapshot, WorldInfo info);
+    Future<Void> registerWorld(BukkitView snapshot, WorldInfo info);
 
-    void unregisterWorld(String fullName);
+    Future<Void> unregisterWorld(String fullName);
 
-    void unregisterWorld(String serverName, String sampleName, UUID uuid);
+    Future<Void> unregisterWorld(String serverName, String sampleName, UUID uuid);
 
-    void resetWorlds(ServerView view);
+    Future<Void> resetWorlds(ServerView view);
 
-    boolean isWorldLoaded(WorldInfo info);
+    Future<Boolean> isWorldLoaded(WorldInfo info);
 
-    boolean isWorldLoaded(String fullName);
+    Future<Boolean> isWorldLoaded(String fullName);
 
-    Optional<BukkitView> getLoadedServer(WorldInfo info);
+    Future<Optional<BukkitView>> getLoadedServer(WorldInfo info);
 
-    boolean isWorldLoaded(String serverName, String sampleName, UUID uuid);
+    Future<Boolean> isWorldLoaded(String serverName, String sampleName, UUID uuid);
 }
