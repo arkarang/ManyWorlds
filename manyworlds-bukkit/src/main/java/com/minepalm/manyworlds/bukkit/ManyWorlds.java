@@ -11,6 +11,7 @@ import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
+import com.minepalm.manyworlds.core.WorldToken;
 import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
@@ -49,14 +50,27 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
         this.serverName = conf.getServerName();
 
-        GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties());
+        GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
         core = new BukkitCore(this, globalDatabase, new ProxyController(HelloBukkit.getConnections()));
+
+        PacketListener listener = new PacketListener(core, Executors.newSingleThreadExecutor(), new PacketResolver(Executors.newSingleThreadExecutor(), this.getGlobalDatabase()));
+
+        listener.register(WorldCreatePacket.class, packet -> {
+            core.createNewWorld(new ManyWorldInfo(WorldTokens.USER, packet.getSampleName(), packet.getWorldName()));
+        });
+
+        listener.register(WorldLoadPacket.class, (packet) -> {
+            if(packet.isLoad())
+                core.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+            else
+                core.save(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+        });
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands());
 
         Bukkit.getPluginManager().registerEvents(new Listener(), this);
-        Bukkit.getPluginManager().registerEvents(core.getListener(), this);
+        Bukkit.getPluginManager().registerEvents(listener, this);
     }
 
     @Override
