@@ -14,7 +14,7 @@ import lombok.Getter;
 import java.util.*;
 
 //todo: 나중으로
-public class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase {
+public abstract class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase {
 
     @Getter
     BungeeView proxy;
@@ -29,92 +29,4 @@ public class RedisGlobalDatabase extends AbstractRedis implements GlobalDatabase
         this.currentServer = snapshot;
     }
 
-
-    @Override
-    public ServerView getServer(String name) {
-        return null;
-    }
-
-    @Override
-    public BukkitView getBukkitServer(String name) {
-        String json = this.getSyncCommands().get("server_"+name);
-        try {
-            return mapper.readValue(json, BukkitServerView.class);
-        }catch (JsonProcessingException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public List<BukkitView> getServers() {
-        List<BukkitView> views = new ArrayList<>();
-        String servers = this.getSyncCommands().get("servers");
-
-        try {
-            List<String> list = mapper.readValue(servers, List.class);
-            list.forEach(name->{
-                views.add(getBukkitServer(name));
-            });
-        }catch (JsonProcessingException e){
-            e.printStackTrace();
-        }
-
-        return views;
-    }
-
-    @Override
-    public List<String> getLoadedWorlds(String serverName) {
-        return null;
-    }
-
-    @Override
-    public void register() {
-
-    }
-
-    @Override
-    public void unregister() {
-
-    }
-
-    @Override
-    public void registerWorld(BukkitView snapshot, WorldInfo info) {
-
-    }
-
-    @Override
-    public void unregisterWorld(String fullName) {
-
-    }
-
-    @Override
-    public void unregisterWorld(String serverName, String sampleName, UUID uuid) {
-
-    }
-
-    @Override
-    public void resetWorlds(ServerView view) {
-
-    }
-
-    @Override
-    public boolean isWorldLoaded(WorldInfo info) {
-        return false;
-    }
-
-    @Override
-    public boolean isWorldLoaded(String fullName) {
-        return false;
-    }
-
-    @Override
-    public Optional<BukkitView> getLoadedServer(WorldInfo info) {
-        return Optional.empty();
-    }
-
-    @Override
-    public boolean isWorldLoaded(String serverName, String sampleName, UUID uuid) {
-        return false;
-    }
 }
