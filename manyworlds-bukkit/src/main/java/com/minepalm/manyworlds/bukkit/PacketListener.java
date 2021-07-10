@@ -1,6 +1,6 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.minepalm.hellobungee.api.events.BukkitMessageReceivedEvent;
+import com.minepalm.hellobungee.bukkit.events.BukkitMessageReceivedEvent;
 import com.minepalm.manyworlds.api.bukkit.WorldManager;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
 import com.minepalm.manyworlds.core.netty.PacketExecutor;
@@ -31,7 +31,6 @@ public class PacketListener implements Listener {
     public <T extends WorldPacket> void onReceived(BukkitMessageReceivedEvent event){
         service.submit(()->{
             try {
-                event.getMessage().get().readerIndex(0);
                 Future<? extends WorldPacket> future = resolver.resolve(event.getMessage().get());
                 T packet = (T)future.get();
                 Optional.ofNullable(map.get(packet.getClass())).ifPresent(pe->((PacketExecutor<T>)pe).execute(packet));
