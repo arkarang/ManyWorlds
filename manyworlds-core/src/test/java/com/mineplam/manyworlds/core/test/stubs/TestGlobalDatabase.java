@@ -9,8 +9,14 @@ import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class TestGlobalDatabase implements GlobalDatabase {
+
+    ExecutorService service = Executors.newSingleThreadExecutor();
+
     @Override
     public BungeeView getProxy() {
         return null;
@@ -18,31 +24,26 @@ public class TestGlobalDatabase implements GlobalDatabase {
 
     @Override
     public ServerView getCurrentServer() {
-        return new ServerView() {
-            @Override
-            public String getServerName() {
-                return "test";
-            }
-        };
+        return () -> "test";
     }
 
     @Override
-    public ServerView getServer(String name) {
-        return () -> name;
+    public Future<ServerView> getServer(String name) {
+        return service.submit(()-> ()->name);
     }
 
     @Override
-    public BukkitView getBukkitServer(String name) {
+    public Future<BukkitView> getBukkitServer(String name) {
         return null;
     }
 
     @Override
-    public List<BukkitView> getServers() {
+    public Future<List<BukkitView>> getServers() {
         return null;
     }
 
     @Override
-    public List<String> getLoadedWorlds(String serverName) {
+    public Future<List<String>> getLoadedWorlds(String serverName) {
         return null;
     }
 
@@ -57,42 +58,43 @@ public class TestGlobalDatabase implements GlobalDatabase {
     }
 
     @Override
-    public void registerWorld(BukkitView snapshot, WorldInfo info) {
-
+    public Future<Void> registerWorld(BukkitView snapshot, WorldInfo info) {
+        return null;
     }
 
     @Override
-    public void unregisterWorld(String fullName) {
-
+    public Future<Void> unregisterWorld(String fullName) {
+        return null;
     }
 
     @Override
-    public void unregisterWorld(String serverName, String sampleName, UUID uuid) {
-
+    public Future<Void> unregisterWorld(String serverName, String sampleName, UUID uuid) {
+        return null;
     }
 
     @Override
-    public void resetWorlds(ServerView view) {
-
+    public Future<Void> resetWorlds(ServerView view) {
+        return null;
     }
 
     @Override
-    public boolean isWorldLoaded(WorldInfo info) {
-        return false;
+    public Future<Boolean> isWorldLoaded(WorldInfo info) {
+        return null;
     }
 
     @Override
-    public boolean isWorldLoaded(String fullName) {
-        return false;
+    public Future<Boolean> isWorldLoaded(String fullName) {
+        return null;
     }
 
     @Override
-    public Optional<BukkitView> getLoadedServer(WorldInfo info) {
-        return Optional.empty();
+    public Future<Optional<BukkitView>> getLoadedServer(WorldInfo info) {
+        return null;
     }
 
     @Override
-    public boolean isWorldLoaded(String serverName, String sampleName, UUID uuid) {
-        return false;
+    public Future<Boolean> isWorldLoaded(String serverName, String sampleName, UUID uuid) {
+        return null;
     }
+
 }

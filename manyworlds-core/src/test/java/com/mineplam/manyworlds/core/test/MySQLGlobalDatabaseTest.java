@@ -7,6 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 public class MySQLGlobalDatabaseTest {
 
@@ -21,14 +23,14 @@ public class MySQLGlobalDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props);
+        db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor());
     }
 
     @Test
-    public void registerTest(){
+    public void registerTest() throws ExecutionException, InterruptedException {
         db.register();
-        Assert.assertNotNull(db.getServer("test"));
+        Assert.assertNotNull(db.getServer("test").get());
         db.unregister();
-        Assert.assertNull(db.getServer("test"));
+        Assert.assertNull(db.getServer("test").get());
     }
 }
