@@ -30,9 +30,10 @@ public class PacketResolver {
             return factory.createWorldCreate(sampleName, worldName);
         });
         register(PacketTypes.WORLD_LOAD_UNLOAD, (factory, left) -> {
+            String sampleName = readString(left);
             String worldName = readString(left);
             boolean b = left.readBoolean();
-            return factory.createWorldLoad(worldName, b);
+            return factory.createWorldLoad(sampleName, worldName, b);
         });
         register(PacketTypes.SERVER_STATUS, (factory, left) -> {
             boolean b = left.readBoolean();
@@ -69,7 +70,7 @@ public class PacketResolver {
                 throw new CorruptedPacketException("Target server is not here. : "+to);
 
             byte packetID = buf.readByte();
-            PacketFactory factory = PacketFactory.newPacket(database.getServer(from), database.getServer(to));
+            PacketFactory factory = PacketFactory.newPacket(database.getServer(from).get(), database.getServer(to).get());
 
             return Optional.ofNullable(strategies.get(packetID)).orElseThrow(()-> new CorruptedPacketException("Cannot find packet resolve strategy ID : "+packetID)).get(factory, buf);
         });
