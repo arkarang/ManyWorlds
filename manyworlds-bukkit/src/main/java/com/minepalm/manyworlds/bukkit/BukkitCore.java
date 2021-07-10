@@ -10,10 +10,6 @@ import com.minepalm.manyworlds.core.AbstractManyWorlds;
 import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
-import com.minepalm.manyworlds.core.netty.PacketResolver;
-import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
-import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
-import lombok.AccessLevel;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
@@ -26,17 +22,14 @@ import java.util.concurrent.Future;
 
 public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
-    private static final ExecutorService POOL, CORE;
+    private static final ExecutorService POOL, SERVICE;
 
     @Getter
     static BukkitCore inst;
 
-    @Getter(AccessLevel.PACKAGE)
-    PacketListener listener;
-
     static{
         POOL = Executors.newScheduledThreadPool(4);
-        CORE = Executors.newSingleThreadExecutor();
+        SERVICE = Executors.newSingleThreadExecutor();
 
     }
 
@@ -70,18 +63,6 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
         globalDatabase.resetWorlds(plugin);
         this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createServerUpdated(true));
 
-        listener = new PacketListener(this, Executors.newSingleThreadExecutor(), new PacketResolver(Executors.newSingleThreadExecutor(), this.getGlobalDatabase()));
-
-        listener.register(WorldCreatePacket.class, packet -> {
-            this.createNewWorld(new ManyWorldInfo(WorldTokens.USER, packet.getSampleName(), packet.getWorldName()));
-        });
-
-        listener.register(WorldLoadPacket.class, (packet) -> {
-            if(packet.isLoad())
-                this.loadWorld(new ManyWorldInfo(WorldTokens.USER, packet.getWorldName()));
-            else
-                this.save(new ManyWorldInfo(WorldTokens.USER, packet.getWorldName()));
-        });
     }
 
     @Override
@@ -119,7 +100,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> createNewWorld(WorldInfo info) {
-        return CORE.submit(()->{
+        return SERVICE.submit(()->{
             try {
                 WorldLoader loader = getWorldLoader(WorldTokens.SAMPLE);
                 WorldInfo swapped = new ManyWorldInfo(WorldTokens.SAMPLE, info.getSampleName(), info.getSampleName());
@@ -137,12 +118,11 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> loadWorld(WorldInfo info){
-        return CORE.submit(()->{
+        return SERVICE.submit(()->{
             try {
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
                 worldStorage.registerWorld(loader.deserialize(preparedWorld));
-                this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createWorldLoad(info.getWorldName(), true));
             }catch (IOException | InterruptedException | ExecutionException | LoaderNotFoundException e){
                 plugin.getLogger().severe("World "+info.getWorldName()+" could not be loaded by: "+ e.getMessage());
             }
@@ -157,9 +137,9 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> save(String worldFullName) {
-        return CORE.submit(()->{
-            getWorldStorage().unregisterWorld(worldFullName);
-            this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createWorldLoad(worldFullName, false));
+        return SERVICE.submit(()->{
+            ManyWorld world = getWorldStorage().unregisterWorld(worldFullName);
+            this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), false));
             return null;
         });
     }
