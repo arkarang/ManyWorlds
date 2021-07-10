@@ -7,6 +7,10 @@ import com.minepalm.manyworlds.api.bukkit.ManyWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldStorage;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
+import com.minepalm.manyworlds.bukkit.events.ManyWorldLoadAfterEvent;
+import com.minepalm.manyworlds.bukkit.events.ManyWorldLoadBeforeEvent;
+import com.minepalm.manyworlds.bukkit.events.ManyWorldUnloadAfterEvent;
+import com.minepalm.manyworlds.bukkit.events.ManyWorldUnloadBeforeEvent;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,34 +30,17 @@ todo:
 @RequiredArgsConstructor
 public class ManyWorldStorage implements WorldStorage {
 
+    //todo: 메모리 누수 위험, ManyWorld -> WorldInfo로 교체 필요.
     private static volatile HashMap<String, ManyWorld> worlds = new HashMap<>();
-    private static final Multimap<String, String> nameHints = HashMultimap.create();
 
     private final SlimeNMS nms;
 
     @Getter
     private final int maximumCounts;
 
-    public void registerWorld(ManyWorld world, List<String> subNames) {
-        subNames.forEach(name->nameHints.put(name, world.getWorldInfo().getWorldName()));
-        registerWorld(world);
-    }
-
-    @Override
-    public Collection<String> getWorldAlias(String name) {
-        return nameHints.get(name);
-    }
-
     @Override
     public ManyWorld getLoadedWorld(String name) {
         return worlds.get(name);
-    }
-
-    @Override
-    public List<ManyWorld> getLoadedWorlds(String tag) {
-        List<ManyWorld> founds = new ArrayList<>();
-        getWorldAlias(tag).forEach(alias -> founds.add(worlds.get(tag)));
-        return founds;
     }
 
     @Override
@@ -70,9 +57,15 @@ public class ManyWorldStorage implements WorldStorage {
     public void registerWorld(ManyWorld world) {
         if(world instanceof CraftManyWorld) {
             Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
-                worlds.put(world.getName(), world);
-                nms.generateWorld(world);
-                ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
+                ManyWorldLoadBeforeEvent event = new ManyWorldLoadBeforeEvent(world.getWorldInfo(), world);
+                Bukkit.getPluginManager().callEvent(event);
+                if(!event.isCancelled()) {
+                    worlds.put(world.getName(), world);
+                    nms.generateWorld(world);
+                    ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
+                    ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), true));
+                    Bukkit.getPluginManager().callEvent(new ManyWorldLoadAfterEvent(world.getWorldInfo(), world));
+                }
             });
         }
     }
@@ -82,7 +75,15 @@ public class ManyWorldStorage implements WorldStorage {
         ManyWorld mw = worlds.get(str);
         if(mw != null) {
             Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
-            world.ifPresent(w -> Bukkit.unloadWorld(w, true));
+            if(world.isPresent()){
+                ManyWorldUnloadBeforeEvent event = new ManyWorldUnloadBeforeEvent(mw.getWorldInfo(), mw);
+                Bukkit.getPluginManager().callEvent(event);
+                if(!event.isCancelled()) {
+                    Bukkit.unloadWorld(world.get(), true);
+                    ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(mw.getWorldInfo(), false));
+                    Bukkit.getPluginManager().callEvent(new ManyWorldUnloadAfterEvent(mw.getWorldInfo(), mw));
+                }
+            }
         }
         return mw;
     }
@@ -98,13 +99,6 @@ public class ManyWorldStorage implements WorldStorage {
 
     void unregisterWorld(ManyWorld world){
         this.unregisterWorld(world.getName());
-    }
-
-    @Override
-    public List<ManyWorld> unregisterWorlds(String tag) {
-        List<ManyWorld> worlds = getLoadedWorlds(tag);
-        worlds.forEach(this::unregisterWorld);
-        return worlds;
     }
 
     @Override
