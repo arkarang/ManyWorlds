@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /*
 * ManyWorlds - SWM 기반 번지코드 월드 밸런싱 플러그인
@@ -50,11 +51,14 @@ public class Commands extends BaseCommand {
     @Description("네트워크 전체에 로드되어 있는 정보를 봅니다.")
     public void allInfo(CommandSender sender){
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()->{
-            List<BukkitView> views = ManyWorlds.getGlobalDatabase().getServers();
-            for (BukkitView view : views) {
-                for (String loadedWorld : ManyWorlds.getGlobalDatabase().getLoadedWorlds(view.getServerName())) {
-                    sender.sendMessage("서버: "+view.getServerName()+" 월드: "+loadedWorld);
+            try {
+                List<BukkitView> views = ManyWorlds.getGlobalDatabase().getServers().get();
+                for (BukkitView view : views) {
+                    for (String loadedWorld : ManyWorlds.getGlobalDatabase().getLoadedWorlds(view.getServerName()).get())
+                        sender.sendMessage("서버: " + view.getServerName() + " 월드: " + loadedWorld);
                 }
+            }catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
             }
         });
     }
@@ -75,17 +79,21 @@ public class Commands extends BaseCommand {
         Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()-> {
             BukkitView view;
 
-            if(name.equals("!Self")) {
-                view = (BukkitView) ManyWorlds.getGlobalDatabase().getCurrentServer();
-            }else{
-                view = ManyWorlds.getGlobalDatabase().getBukkitServer(name);
-            }
+            try {
+                if (name.equals("!Self")) {
+                    view = (BukkitView) ManyWorlds.getGlobalDatabase().getCurrentServer();
+                } else {
+                    view = ManyWorlds.getGlobalDatabase().getBukkitServer(name).get();
+                }
 
-            if(view == null){
-                player.sendMessage("존재하지 않는 버킷입니다.");
-            }else {
-                player.sendMessage("버킷: " + view.getServerName());
-                player.sendMessage("버킷 토탈 카운트: " + view.getLoadedWorlds());
+                if (view == null) {
+                    player.sendMessage("존재하지 않는 버킷입니다.");
+                } else {
+                    player.sendMessage("버킷: " + view.getServerName());
+                    player.sendMessage("버킷 토탈 카운트: " + view.getLoadedWorlds());
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
             }
         });
 
