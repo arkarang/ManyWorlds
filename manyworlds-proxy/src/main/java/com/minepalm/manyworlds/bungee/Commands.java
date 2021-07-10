@@ -5,6 +5,7 @@ import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.WorldTokens;
+import lombok.SneakyThrows;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Command;
@@ -17,6 +18,7 @@ public class Commands extends Command {
         super("월드번지");
     }
 
+    @SneakyThrows
     @Override
     public void execute(CommandSender sender, String[] strings) {
         if(strings.length >= 1){
@@ -34,7 +36,7 @@ public class Commands extends Command {
                         String serverName = strings[1];
                         String typeName = strings[2];
                         String worldName = strings[3];
-                        BukkitView view = ManyWorldsBungee.getDatabase().getBukkitServer(serverName);
+                        BukkitView view = ManyWorldsBungee.getDatabase().getBukkitServer(serverName).get();
                         ManyWorldsBungee.createSpecific(view, new ManyWorldInfo(WorldTokens.USER, typeName, worldName));
                         sender.sendMessage(new TextComponent("수동생성을 시도합니다..."));
                     }else{
@@ -53,7 +55,7 @@ public class Commands extends Command {
                     if(strings.length == 3) {
                         String serverName = strings[1];
                         String worldName = strings[2];
-                        BukkitView view = ManyWorldsBungee.getDatabase().getBukkitServer(serverName);
+                        BukkitView view = ManyWorldsBungee.getDatabase().getBukkitServer(serverName).get();
                         ManyWorldsBungee.loadSpecific(view, new ManyWorldInfo(WorldTokens.USER, worldName), true);
                         sender.sendMessage(new TextComponent("수동할당을 시도합니다..."));
                     }else{
@@ -64,7 +66,7 @@ public class Commands extends Command {
                     if(strings.length == 2) {
                         String worldName = strings[1];
                         WorldInfo info = new ManyWorldInfo(WorldTokens.USER, worldName);
-                        Optional<BukkitView> view = ManyWorldsBungee.getDatabase().getLoadedServer(info);
+                        Optional<BukkitView> view = ManyWorldsBungee.getDatabase().getLoadedServer(info).get();
                         if(view.isPresent()) {
                             sender.sendMessage(new TextComponent("언로드를 시도합니다..."));
                             ManyWorldsBungee.loadSpecific(view.get(), info, false);
