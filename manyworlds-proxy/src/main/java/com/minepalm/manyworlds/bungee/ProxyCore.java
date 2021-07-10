@@ -45,7 +45,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
             BukkitView least = null;
             int i = 1000;
 
-            for (BukkitView view : super.getGlobalDatabase().getServers()) {
+            for (BukkitView view : super.getGlobalDatabase().getServers().get()) {
                 ProxyServer.getInstance().getLogger().info("view: "+view.getServerName()+": "+view.getLoadedWorlds());
                 least = least == null ? view : least;
                 if(i > view.getLoadedWorlds()){
@@ -66,11 +66,11 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
             BukkitView least = null;
             int i = 1000;
 
-            for (BukkitView view : super.getGlobalDatabase().getServers()) {
+            for (BukkitView view : super.getGlobalDatabase().getServers().get()) {
                 least = least == null ? view : least;
                 least = i > view.getLoadedWorlds() ? view : least;
             }
-            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info.getWorldName(), true));
+            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info, true));
 
             return least;
         });
@@ -88,7 +88,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
     @Override
     public Future<Void> loadSpecific(BukkitView view, WorldInfo info, boolean onOff) {
         return EXECUTOR_SERVICE.submit(()->{
-            this.getController().send(PacketFactory.newPacket(plugin, view).createWorldLoad(info.getWorldName(), onOff));
+            this.getController().send(PacketFactory.newPacket(plugin, view).createWorldLoad(info, onOff));
             return null;
         });
     }
