@@ -19,12 +19,9 @@ public abstract class BasicPacket extends PacketMessage implements WorldPacket{
         this.from = from;
         this.to = to;
         ByteBuf contexts = super.get();
-        contexts.writeInt(NAME.length());
-        contexts.writeCharSequence(NAME, StandardCharsets.UTF_8);
-        contexts.writeInt(from.getServerName().length());
-        contexts.writeCharSequence(from.getServerName(), StandardCharsets.UTF_8);
-        contexts.writeInt(to.getServerName().length());
-        contexts.writeCharSequence(to.getServerName(), StandardCharsets.UTF_8);
+        contexts.writeInt(NAME.length()).writeCharSequence(NAME, StandardCharsets.UTF_8);
+        contexts.writeInt(from.getServerName().length()).writeCharSequence(from.getServerName(), StandardCharsets.UTF_8);
+        contexts.writeInt(to.getServerName().length()).writeCharSequence(to.getServerName(), StandardCharsets.UTF_8);
         contexts.writeByte(getPacketID());
 
     }

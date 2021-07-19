@@ -20,18 +20,13 @@ public class WorldLoadPacket extends BasicPacket{
         this.worldName = worldName;
         this.load = load;
         ByteBuf buf = super.get();
+        buf.writeInt(sampleName.length()).writeCharSequence(sampleName, StandardCharsets.UTF_8);
         buf.writeInt(worldName.length()).writeCharSequence(worldName, StandardCharsets.UTF_8);
         buf.writeBoolean(load);
     }
 
     WorldLoadPacket(ServerView from, ServerView to, WorldInfo info, boolean load) {
-        super(from, to);
-        this.sampleName = info.getSampleName();
-        this.worldName = info.getWorldName();
-        this.load = load;
-        ByteBuf buf = super.get();
-        buf.writeInt(worldName.length()).writeCharSequence(worldName, StandardCharsets.UTF_8);
-        buf.writeBoolean(load);
+        this(from, to, info.getSampleName(), info.getWorldName(), load);
     }
 
     public byte getPacketID() {

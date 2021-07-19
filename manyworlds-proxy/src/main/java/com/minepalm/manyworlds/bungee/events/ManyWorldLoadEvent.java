@@ -6,6 +6,6 @@ import net.md_5.bungee.api.plugin.Event;
 
 @Getter
 @RequiredArgsConstructor
-public class WorldUnloadEvent extends Event {
+public class ManyWorldLoadEvent extends Event {
     final String sampleName, worldName;
 }

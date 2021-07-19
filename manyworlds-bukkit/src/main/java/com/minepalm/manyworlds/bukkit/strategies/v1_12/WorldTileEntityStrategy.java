@@ -55,9 +55,12 @@ public class WorldTileEntityStrategy implements WorldStrategy {
 
                 if (chunk != null) {
                     chunk.getTileEntities().add(tileEntityCompound);
-                }else{
+                }
+                /*
+                else{
                     throw new IllegalStateException("chunk is null");
                 }
+                 */
             }
         }
 

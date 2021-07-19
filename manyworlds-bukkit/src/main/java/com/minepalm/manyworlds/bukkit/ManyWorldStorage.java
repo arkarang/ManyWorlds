@@ -57,6 +57,8 @@ public class ManyWorldStorage implements WorldStorage {
     public void registerWorld(ManyWorld world) {
         if(world instanceof CraftManyWorld) {
             Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
+                //todo: remove this after testing
+                Bukkit.getLogger().info("MANYWORLD - REGISTER WORLD");
                 ManyWorldLoadBeforeEvent event = new ManyWorldLoadBeforeEvent(world.getWorldInfo(), world);
                 Bukkit.getPluginManager().callEvent(event);
                 if(!event.isCancelled()) {

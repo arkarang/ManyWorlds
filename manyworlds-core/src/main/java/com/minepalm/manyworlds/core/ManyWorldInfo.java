@@ -30,7 +30,7 @@ public class ManyWorldInfo implements WorldInfo {
     }
 
     public ManyWorldInfo(WorldType type, String worldName){
-        this(type, "", worldName, System.currentTimeMillis());
+        this(type, type.getName(), worldName, System.currentTimeMillis());
     }
 
     public ManyWorldInfo(WorldType type, String sampleName, String worldName){

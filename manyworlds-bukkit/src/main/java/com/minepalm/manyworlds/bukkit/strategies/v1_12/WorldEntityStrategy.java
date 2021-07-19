@@ -69,9 +69,12 @@ public class WorldEntityStrategy implements WorldStrategy {
 
                 if (chunk != null) {
                     chunk.getEntities().add(entityCompound);
-                }else {
+                }
+                /*
+                else {
                     throw new IllegalStateException("chunk is null");
                 }
+                 */
             }
         }
 

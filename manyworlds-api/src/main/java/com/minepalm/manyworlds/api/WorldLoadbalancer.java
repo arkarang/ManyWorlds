@@ -10,9 +10,10 @@ public interface WorldLoadbalancer {
 
     Future<ServerView> loadAtLeast(WorldInfo info);
 
+    Future<ServerView> getAtLeast();
+
     Future<Void> createSpecific(BukkitView view, WorldInfo info);
 
     Future<Void> loadSpecific(BukkitView view, WorldInfo info, boolean onOff);
-
 
 }

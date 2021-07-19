@@ -10,5 +10,6 @@ public class ProxyController extends AbstractController implements BungeeControl
     public ProxyController(HelloConnections connections){
         super(connections);
         canExecutes.add(PacketTypes.SERVER_STATUS);
+        canExecutes.add(PacketTypes.WORLD_LOAD_UNLOAD);
     }
 }

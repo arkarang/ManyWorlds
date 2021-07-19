@@ -17,11 +17,13 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase {
 
     private final ExecutorService service;
 
+    final Logger logger;
     final String serverList;
     final String worldList;
     final String proxyName;
@@ -29,14 +31,14 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     @Getter
     final ServerView currentServer;
 
-
-    public MySQLGlobalDatabase(String proxy, ServerView self, String servers_table, String worlds_table, Properties properties, ExecutorService service) {
+    public MySQLGlobalDatabase(String proxy, ServerView self, String servers_table, String worlds_table, Properties properties, ExecutorService service, Logger logger) {
         super(properties);
         this.service = service;
         this.proxyName = proxy;
         this.currentServer = self;
         this.serverList = servers_table;
         this.worldList = worlds_table;
+        this.logger = logger;
         create();
     }
 
@@ -247,14 +249,18 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     @Override
     public Future<Boolean> isWorldLoaded(String fullName) {
+        logger.info("isWorldLoaded start1");
         return service.submit(()-> {
+            logger.info("isWorldLoaded start2");
             try (Connection con = hikari.getConnection()) {
                 PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `world_name`=?");
                 ps.setString(1, fullName);
                 ResultSet rs = ps.executeQuery();
+                logger.info("executed query");
                 return rs.next();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.info(e.getMessage());
+                //e.printStackTrace();
             }
             return false;
         });

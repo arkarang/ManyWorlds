@@ -3,32 +3,30 @@ package com.minepalm.manyworlds.bungee;
 import com.minepalm.hellobungee.bungee.HelloBungee;
 import com.minepalm.manyworlds.api.*;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.bungee.events.WorldLoadEvent;
-import com.minepalm.manyworlds.bungee.events.WorldUnloadEvent;
-import com.minepalm.manyworlds.core.AbstractManyWorlds;
+import com.minepalm.manyworlds.bungee.events.ManyWorldLoadEvent;
+import com.minepalm.manyworlds.bungee.events.ManyWorldUnloadEvent;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
-import com.minepalm.manyworlds.core.netty.PacketFactory;
 import com.minepalm.manyworlds.core.netty.PacketResolver;
 import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-@Getter
 public class ManyWorldsBungee extends Plugin implements BungeeView {
 
     @Getter
-    static ManyWorldsBungee inst;
+    public static ManyWorldsBungee inst;
     @Getter
-    static ProxyCore core;
+    public static ProxyCore core;
     @Getter
     static GlobalDatabase database;
 
+    @Getter
     private String serverName;
+    @Getter
     Conf conf;
 
     @Override
@@ -36,19 +34,21 @@ public class ManyWorldsBungee extends Plugin implements BungeeView {
         inst = this;
         conf = new Conf(this, "config.yml", true);
         serverName = conf.getName();
-        database = new MySQLGlobalDatabase(serverName, this, conf.getServerTable(), conf.getWorldsTable(), conf.getProperties(), Executors.newScheduledThreadPool(4));
-        core = new ProxyCore(this, database, new BukkitWorldController(HelloBungee.getConnections()));
+        ManyWorldsBungee.database = new MySQLGlobalDatabase(serverName, this, conf.getServerTable(), conf.getWorldsTable(), conf.getProperties(), Executors.newScheduledThreadPool(4), getLogger());
+        ManyWorldsBungee.core = new ProxyCore(this, database, new BukkitWorldController(HelloBungee.getConnections()));
+        ProxyServer.getInstance().getLogger().info("ManyWorlds - bungee("+serverName+") load complete");
 
         Listener packetListener = new Listener(new PacketResolver(Executors.newSingleThreadExecutor(), database));
         packetListener.register(WorldLoadPacket.class, packet->{
             if(packet.isLoad()){
-                ProxyServer.getInstance().getPluginManager().callEvent(new WorldLoadEvent(packet.getSampleName(), packet.getWorldName()));
+                ProxyServer.getInstance().getPluginManager().callEvent(new ManyWorldLoadEvent(packet.getSampleName(), packet.getWorldName()));
             }else
-                ProxyServer.getInstance().getPluginManager().callEvent(new WorldUnloadEvent(packet.getSampleName(), packet.getWorldName()));
+                ProxyServer.getInstance().getPluginManager().callEvent(new ManyWorldUnloadEvent(packet.getSampleName(), packet.getWorldName()));
         });
 
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new Commands());
         ProxyServer.getInstance().getPluginManager().registerListener(this, packetListener);
+        ProxyServer.getInstance().getLogger().info("ManyWorlds - bungee enabled");
     }
 
     @Override

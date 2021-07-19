@@ -50,20 +50,23 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
         this.serverName = conf.getServerName();
 
-        GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
+        GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4), getLogger());
         core = new BukkitCore(this, globalDatabase, new ProxyController(HelloBukkit.getConnections()));
 
-        PacketListener listener = new PacketListener(core, Executors.newSingleThreadExecutor(), new PacketResolver(Executors.newSingleThreadExecutor(), this.getGlobalDatabase()));
+        PacketListener listener = new PacketListener(core, new PacketResolver(Executors.newSingleThreadExecutor(), getGlobalDatabase()));
 
         listener.register(WorldCreatePacket.class, packet -> {
             core.createNewWorld(new ManyWorldInfo(WorldTokens.USER, packet.getSampleName(), packet.getWorldName()));
         });
 
         listener.register(WorldLoadPacket.class, (packet) -> {
-            if(packet.isLoad())
-                core.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
-            else
-                core.save(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+            if(packet.isLoad()) {
+                if(Bukkit.getWorld(packet.getWorldName()) == null)
+                    core.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+            }else {
+                if(Bukkit.getWorld(packet.getWorldName()) != null)
+                    core.save(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+            }
         });
 
         PaperCommandManager manager = new PaperCommandManager(this);

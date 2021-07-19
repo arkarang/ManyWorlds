@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 public class MySQLGlobalDatabaseTest {
 
@@ -23,7 +24,7 @@ public class MySQLGlobalDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor());
+        db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor(), Logger.getGlobal());
     }
 
     @Test
@@ -32,5 +33,10 @@ public class MySQLGlobalDatabaseTest {
         Assert.assertNotNull(db.getServer("test").get());
         db.unregister();
         Assert.assertNull(db.getServer("test").get());
+    }
+
+    @Test
+    public void worldLoadedTest() throws ExecutionException, InterruptedException {
+        Assert.assertFalse(db.isWorldLoaded("asdf").get());
     }
 }

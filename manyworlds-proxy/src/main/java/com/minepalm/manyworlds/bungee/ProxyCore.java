@@ -11,6 +11,7 @@ import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,15 +47,13 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
             int i = 1000;
 
             for (BukkitView view : super.getGlobalDatabase().getServers().get()) {
-                ProxyServer.getInstance().getLogger().info("view: "+view.getServerName()+": "+view.getLoadedWorlds());
                 least = least == null ? view : least;
                 if(i > view.getLoadedWorlds()){
                     least = view;
                     i = view.getLoadedWorlds();
                 }
-                this.getController().send(PacketFactory.newPacket(plugin, least).createWorldCreate(info.getSampleName(), info.getWorldName()));
-                ProxyServer.getInstance().getLogger().info("least: "+view.getServerName()+": "+view.getLoadedWorlds());
             }
+            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldCreate(info.getSampleName(), info.getWorldName()));
 
             return least;
         });
@@ -73,6 +72,22 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
             this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info, true));
 
             return least;
+        });
+    }
+
+    @Override
+    public Future<ServerView> getAtLeast() {
+        return EXECUTOR_SERVICE.submit(()-> {
+            BukkitView view = null;
+            List<BukkitView> servers = ManyWorldsBungee.getDatabase().getServers().get();
+            for (BukkitView server : servers) {
+                if (view == null)
+                    view = server;
+                else {
+                    view = view.getLoadedWorlds() < server.getLoadedWorlds() ? view : server;
+                }
+            }
+            return view;
         });
     }
 

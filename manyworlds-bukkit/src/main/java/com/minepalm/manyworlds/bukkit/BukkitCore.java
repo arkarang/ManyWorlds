@@ -86,7 +86,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
         if(loaders.containsKey(type))
             return loaders.get(type);
         else
-            throw new LoaderNotFoundException("loader does not exists");
+            throw new LoaderNotFoundException("loader (WorldType: "+type.getName()+") does not exists");
     }
 
     @Override
@@ -94,7 +94,6 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
         boolean exists = loaders.containsKey(type);
         if(!exists)
             loaders.put(type, loader);
-
         return !exists;
     }
 
@@ -120,6 +119,8 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     public Future<Void> loadWorld(WorldInfo info){
         return SERVICE.submit(()->{
             try {
+                //todo: remove this after testing
+                System.out.println("MANYWORLD - LOAD WORLD");
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
                 worldStorage.registerWorld(loader.deserialize(preparedWorld));

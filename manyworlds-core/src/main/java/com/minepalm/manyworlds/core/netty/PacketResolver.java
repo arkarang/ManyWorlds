@@ -56,7 +56,6 @@ public class PacketResolver {
             try {
                 name = readString(buf);
             }catch (Exception e){
-                e.printStackTrace();
                 throw new CorruptedPacketException("Header is corrupted! ");
             }
 
@@ -76,7 +75,7 @@ public class PacketResolver {
         });
     }
 
-    static String readString(ByteBuf buf){
+    static String readString(ByteBuf buf) throws ArrayIndexOutOfBoundsException{
         int i = buf.readInt();
         return String.valueOf(buf.readCharSequence(i, StandardCharsets.UTF_8));
     }

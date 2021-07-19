@@ -7,7 +7,6 @@ public interface WorldStorage {
 
     void registerWorld(ManyWorld world);
 
-
     ManyWorld getLoadedWorld(String name);
 
     List<String> getLoadedWorldsAll();
