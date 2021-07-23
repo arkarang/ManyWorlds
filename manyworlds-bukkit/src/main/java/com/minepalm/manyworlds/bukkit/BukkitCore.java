@@ -119,8 +119,6 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     public Future<Void> loadWorld(WorldInfo info){
         return SERVICE.submit(()->{
             try {
-                //todo: remove this after testing
-                System.out.println("MANYWORLD - LOAD WORLD");
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
                 worldStorage.registerWorld(loader.deserialize(preparedWorld));
