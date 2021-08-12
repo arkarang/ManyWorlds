@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -55,10 +56,13 @@ public class ManyWorldStorage implements WorldStorage {
 
     @Override
     public void registerWorld(ManyWorld world) {
+        this.registerWorld(world, ()->{});
+    }
+
+    @Override
+    public void registerWorld(ManyWorld world, Runnable after) {
         if(world instanceof CraftManyWorld) {
             Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
-                //todo: remove this after testing
-                Bukkit.getLogger().info("MANYWORLD - REGISTER WORLD");
                 ManyWorldLoadBeforeEvent event = new ManyWorldLoadBeforeEvent(world.getWorldInfo(), world);
                 Bukkit.getPluginManager().callEvent(event);
                 if(!event.isCancelled()) {
@@ -67,6 +71,7 @@ public class ManyWorldStorage implements WorldStorage {
                     ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
                     ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), true));
                     Bukkit.getPluginManager().callEvent(new ManyWorldLoadAfterEvent(world.getWorldInfo(), world));
+                    after.run();
                 }
             });
         }

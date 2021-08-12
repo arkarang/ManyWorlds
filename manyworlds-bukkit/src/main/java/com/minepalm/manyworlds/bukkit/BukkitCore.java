@@ -11,6 +11,7 @@ import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
+import org.bukkit.World;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
@@ -99,6 +101,11 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> createNewWorld(WorldInfo info) {
+        return this.createNewWorld(info, ()->{});
+    }
+
+    @Override
+    public Future<Void> createNewWorld(WorldInfo info, Runnable run) {
         return SERVICE.submit(()->{
             try {
                 WorldLoader loader = getWorldLoader(WorldTokens.SAMPLE);
@@ -107,7 +114,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
                 toUse.setWorldInfo(info);
                 CraftManyWorld mw = (CraftManyWorld) loader.deserialize(toUse);
                 mw.setLoader(getWorldLoader(info.getWorldType()));
-                worldStorage.registerWorld(mw);
+                worldStorage.registerWorld(mw, run);
             }catch (IOException | InterruptedException | ExecutionException | LoaderNotFoundException e){
                 plugin.getLogger().severe("World "+info.getWorldName()+" could not be created by: "+ e.getMessage());
             }
@@ -117,11 +124,16 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> loadWorld(WorldInfo info){
+        return loadWorld(info, ()->{});
+    }
+
+    @Override
+    public Future<Void> loadWorld(WorldInfo info, Runnable after){
         return SERVICE.submit(()->{
             try {
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
-                worldStorage.registerWorld(loader.deserialize(preparedWorld));
+                worldStorage.registerWorld(loader.deserialize(preparedWorld), after);
             }catch (IOException | InterruptedException | ExecutionException | LoaderNotFoundException e){
                 plugin.getLogger().severe("World "+info.getWorldName()+" could not be loaded by: "+ e.getMessage());
             }

@@ -115,10 +115,9 @@ public class ManyWorldLoader implements WorldLoader {
     @Override
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
         ManyWorldStorage storage = (ManyWorldStorage) this.storage;
-        ManyWorld world = storage.remove(s);
+        ManyWorld world = storage.getLoadedWorld(s);
         PreparedWorld pw = serialize(world);
         database.saveWorld(pw);
-        storage.unregisterWorldFromDatabase(s);
     }
 
     @Override

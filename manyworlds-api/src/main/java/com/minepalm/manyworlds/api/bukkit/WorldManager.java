@@ -16,7 +16,11 @@ public interface WorldManager {
 
     Future<Void> createNewWorld(WorldInfo info);
 
+    Future<Void> createNewWorld(WorldInfo info, Runnable run);
+
     Future<Void> loadWorld(WorldInfo info);
+
+    Future<Void> loadWorld(WorldInfo info, Runnable run);
 
     Future<Void> save(WorldInfo info);
 

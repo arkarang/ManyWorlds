@@ -72,7 +72,6 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands());
 
-        Bukkit.getPluginManager().registerEvents(new Listener(), this);
         Bukkit.getPluginManager().registerEvents(listener, this);
     }
 
@@ -101,8 +100,16 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         return core.createNewWorld(info);
     }
 
+    public static Future<Void> createNewWorld(WorldInfo info, Runnable runAfter) {
+        return core.createNewWorld(info, runAfter);
+    }
+
     public static Future<Void> loadWorld(WorldInfo info){
         return core.loadWorld(info);
+    }
+
+    public static Future<Void> loadWorld(WorldInfo info, Runnable after){
+        return core.loadWorld(info, after);
     }
 
     public static Future<Void> save(WorldInfo info) {
