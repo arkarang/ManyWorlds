@@ -11,6 +11,7 @@ import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.netty.PacketFactory;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import javax.annotation.Nullable;
@@ -39,7 +40,9 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     private final ManyWorlds plugin;
 
     @Getter
-    WorldStorage worldStorage;
+    final WorldStorage worldStorage;
+    @Getter
+    final ChunkGenRegistry generatorRegistry;
 
     BukkitCore(ManyWorlds plugin, GlobalDatabase globalDatabase, Controller controller) {
         super(plugin.getConf().getServerName(), globalDatabase, controller);
@@ -52,7 +55,8 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
         Conf conf = plugin.getConf();
         SWMPlugin swm = plugin.getSwm();
 
-        worldStorage = new ManyWorldStorage(swm.getNms(), 100);
+        generatorRegistry = new ChunkGenRegistry();
+        worldStorage = new ManyWorldStorage(swm.getNms(), generatorRegistry,100);
 
         WorldDatabase sampleDB, userDB;
         userDB = this.newMySQL(WorldTokens.USER, conf.getUserTableName());
@@ -148,6 +152,19 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Override
     public Future<Void> save(String worldFullName) {
+        return SERVICE.submit(()->{
+            Bukkit.getWorld(worldFullName).save();
+            return null;
+        });
+    }
+
+    @Override
+    public Future<Void> unload(WorldInfo info) {
+        return unload(info.getWorldName());
+    }
+
+    @Override
+    public Future<Void> unload(String worldFullName) {
         return SERVICE.submit(()->{
             ManyWorld world = getWorldStorage().unregisterWorld(worldFullName);
             this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), false));

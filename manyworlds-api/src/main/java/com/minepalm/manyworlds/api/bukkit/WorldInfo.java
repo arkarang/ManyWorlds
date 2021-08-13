@@ -6,6 +6,8 @@ public interface WorldInfo {
 
     String getWorldName();
 
+    String getGenerator();
+
     WorldType getWorldType();
 
     WorldInfo clone();

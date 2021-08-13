@@ -65,7 +65,7 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
                     core.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
             }else {
                 if(Bukkit.getWorld(packet.getWorldName()) != null)
-                    core.save(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+                    core.unload(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
             }
         });
 
@@ -118,6 +118,14 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
 
     public static Future<Void> save(String worldFullName) {
         return core.save(worldFullName);
+    }
+
+    public static Future<Void> unloadWorld(WorldInfo info){
+        return core.unload(info);
+    }
+
+    public static Future<Void> unloadWorld(String name){
+        return core.unload(name);
     }
 
     public static void send(WorldPacket packet){

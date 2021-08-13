@@ -249,14 +249,11 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     @Override
     public Future<Boolean> isWorldLoaded(String fullName) {
-        logger.info("isWorldLoaded start1");
         return service.submit(()-> {
-            logger.info("isWorldLoaded start2");
             try (Connection con = hikari.getConnection()) {
                 PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `world_name`=?");
                 ps.setString(1, fullName);
                 ResultSet rs = ps.executeQuery();
-                logger.info("executed query");
                 return rs.next();
             } catch (SQLException e) {
                 logger.info(e.getMessage());

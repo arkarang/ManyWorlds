@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -35,6 +36,7 @@ public class ManyWorldStorage implements WorldStorage {
     private static volatile HashMap<String, ManyWorld> worlds = new HashMap<>();
 
     private final SlimeNMS nms;
+    private final ChunkGenRegistry genRegistry;
 
     @Getter
     private final int maximumCounts;
@@ -67,7 +69,7 @@ public class ManyWorldStorage implements WorldStorage {
                 Bukkit.getPluginManager().callEvent(event);
                 if(!event.isCancelled()) {
                     worlds.put(world.getName(), world);
-                    nms.generateWorld(world);
+                    nms.generateWorld(world, genRegistry.get(world.getWorldInfo()));
                     ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
                     ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), true));
                     Bukkit.getPluginManager().callEvent(new ManyWorldLoadAfterEvent(world.getWorldInfo(), world));
@@ -87,6 +89,7 @@ public class ManyWorldStorage implements WorldStorage {
                 Bukkit.getPluginManager().callEvent(event);
                 if(!event.isCancelled()) {
                     Bukkit.unloadWorld(world.get(), true);
+                    ManyWorlds.getGlobalDatabase().unregisterWorld(str);
                     ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(mw.getWorldInfo(), false));
                     Bukkit.getPluginManager().callEvent(new ManyWorldUnloadAfterEvent(mw.getWorldInfo(), mw));
                 }
@@ -97,11 +100,6 @@ public class ManyWorldStorage implements WorldStorage {
 
     void unregisterWorldFromDatabase(String worldName){
         ManyWorlds.getGlobalDatabase().unregisterWorld(worldName);
-    }
-
-    //todo: SlimeLoader 의존성 삭제 후 이 메서드 제거.
-    ManyWorld remove(String str){
-        return worlds.remove(str);
     }
 
     void unregisterWorld(ManyWorld world){

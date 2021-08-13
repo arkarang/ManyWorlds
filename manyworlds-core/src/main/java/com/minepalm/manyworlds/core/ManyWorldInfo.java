@@ -2,12 +2,10 @@ package com.minepalm.manyworlds.core;
 
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@EqualsAndHashCode(exclude = "lastUpdated")
+@EqualsAndHashCode(exclude = {"lastUpdated", "generator"})
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class ManyWorldInfo implements WorldInfo {
 
@@ -24,6 +22,10 @@ public class ManyWorldInfo implements WorldInfo {
 
     @Getter
     final long lastUpdated;
+
+    @Getter
+    @Setter
+    String generator = "null";
 
     public ManyWorldInfo(String typeName, long time){
         this(WorldTokens.SAMPLE, typeName, typeName, time);

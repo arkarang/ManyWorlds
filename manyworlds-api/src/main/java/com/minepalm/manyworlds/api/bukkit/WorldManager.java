@@ -26,4 +26,8 @@ public interface WorldManager {
 
     Future<Void> save(String worldFullName);
 
+    Future<Void> unload(WorldInfo info);
+
+    Future<Void> unload(String worldFullName);
+
 }
