@@ -18,6 +18,7 @@ public abstract class AbstractMySQL{
             String username = properties.getProperty("username");
             String password = properties.getProperty("password");
 
+
             hikariConfig.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database + "?autoReconnect=true&allowMultiQueries=true");
             hikariConfig.setUsername(username);
             hikariConfig.setPassword(password);

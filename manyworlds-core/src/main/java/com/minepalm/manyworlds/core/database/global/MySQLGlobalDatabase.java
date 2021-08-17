@@ -57,7 +57,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
     @Override
     public BungeeView getProxy() {
         try(Connection con = hikari.getConnection()){
-            PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM "+worldList+" NATURAL JOIN "+serverList+" WHERE `proxy`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM "+ worldList + " AS `w` INNER JOIN " + serverList + " AS `s` ON `w`.`proxy` = `s`.`server` WHERE `s`.`server`=?");
             ps.setString(1, proxyName);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
@@ -89,20 +89,22 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     @Override
     public Future<BukkitView> getBukkitServer(String name) {
-        return service.submit(()-> {
-            try (Connection con = hikari.getConnection()) {
-                PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM " + worldList + " NATURAL JOIN " + serverList + " WHERE `server`=?");
-                ps.setString(1, name);
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    int count = rs.getInt(1);
-                    return new BukkitServerView(name, count);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+        return service.submit(()-> getBukkitServerInternally(name));
+    }
+
+    private BukkitView getBukkitServerInternally(String name){
+        try (Connection con = hikari.getConnection()) {
+            PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as `cnt` FROM " + worldList + " AS `w` INNER JOIN " + serverList + " AS `s` ON `w`.`server` = `s`.`server` WHERE `s`.`server`=?");
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return new BukkitServerView(name, count);
             }
-            return null;
-        });
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -114,7 +116,7 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
                 ps.setString(1, "BUKKIT");
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    list.add(getBukkitServer(rs.getString(1)).get());
+                    list.add(getBukkitServerInternally(rs.getString(1)));
                 }
                 return list;
             } catch (SQLException e) {
@@ -150,13 +152,18 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     @Override
     public void register() {
+        register(this.currentServer.getServerName());
+    }
+
+    @Override
+    public void register(String name) {
         try(Connection con = hikari.getConnection()){
             PreparedStatement ps = con.prepareStatement("INSERT INTO "+serverList+" (`type`, `server`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `type`=?, `server`=?");
             String type = currentServer instanceof BungeeView ? "BUNGEE" : "BUKKIT";
             ps.setString(1, type);
-            ps.setString(2, currentServer.getServerName());
+            ps.setString(2, name);
             ps.setString(3, type);
-            ps.setString(4, currentServer.getServerName());
+            ps.setString(4, name);
             ps.execute();
         }catch (SQLException e){
             e.printStackTrace();
@@ -165,11 +172,16 @@ public class MySQLGlobalDatabase extends AbstractMySQL implements GlobalDatabase
 
     @Override
     public void unregister() {
+        unregister(currentServer.getServerName());
+    }
+
+    @Override
+    public void unregister(String name) {
         try (Connection con = hikari.getConnection()){
             PreparedStatement ps = con.prepareStatement("DELETE FROM "+serverList+" WHERE `server`=?");
             PreparedStatement ps2 = con.prepareStatement("DELETE FROM "+worldList+" WHERE `server`=?");
-            ps.setString(1, currentServer.getServerName());
-            ps2.setString(1, currentServer.getServerName());
+            ps.setString(1, name);
+            ps2.setString(1, name);
             ps.execute();
             ps2.execute();
         }catch (SQLException e){

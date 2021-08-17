@@ -1,5 +1,6 @@
 package com.minepalm.manyworlds.bungee;
 
+import com.minepalm.hellobungee.api.HelloClient;
 import com.minepalm.hellobungee.bungee.HelloBungee;
 import com.minepalm.manyworlds.api.*;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
@@ -12,8 +13,10 @@ import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class ManyWorldsBungee extends Plugin implements BungeeView {
 
@@ -48,6 +51,16 @@ public class ManyWorldsBungee extends Plugin implements BungeeView {
 
         ProxyServer.getInstance().getPluginManager().registerCommand(this, new Commands());
         ProxyServer.getInstance().getPluginManager().registerListener(this, packetListener);
+
+        Map<String, HelloClient> map = HelloBungee.getConnections().getClients();
+        for (String key : map.keySet()) {
+            HelloClient client = map.get(key);
+            if(!client.isConnected()){
+                database.unregister(key);
+                database.resetWorlds(()->key);
+            }
+        }
+
         ProxyServer.getInstance().getLogger().info("ManyWorlds - bungee enabled");
     }
 

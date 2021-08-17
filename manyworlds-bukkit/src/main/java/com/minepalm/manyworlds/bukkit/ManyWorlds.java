@@ -2,6 +2,7 @@ package com.minepalm.manyworlds.bukkit;
 
 import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.plugin.SWMPlugin;
+import com.minepalm.hellobungee.api.HelloClient;
 import com.minepalm.hellobungee.bukkit.HelloBukkit;
 import com.minepalm.hellobungee.bukkit.Listener;
 import com.minepalm.manyworlds.api.BukkitView;
@@ -23,6 +24,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -71,6 +73,14 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands());
+
+        Map<String, HelloClient> map = HelloBukkit.getConnections().getClients();
+        for (String key : map.keySet()) {
+            HelloClient client = map.get(key);
+            if(!client.isConnected()){
+                globalDatabase.unregister(key);
+            }
+        }
 
         Bukkit.getPluginManager().registerEvents(listener, this);
     }

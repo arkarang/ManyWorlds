@@ -24,7 +24,10 @@ public abstract class AbstractController implements Controller {
         if(canExecute(packet.getPacketID())) {
             Optional<HelloClient> optional = Optional.ofNullable(connections.getClient(packet.getTo().getServerName()));
             if(optional.isPresent()){
-                optional.get().sendData(packet);
+                HelloClient client = optional.get();
+                //todo: handling client not connected exception.
+                if(client.isConnected())
+                    client.sendData(packet);
             }else{
                 throw new IllegalArgumentException("cannot find destination: "+packet.getTo());
             }

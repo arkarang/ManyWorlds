@@ -53,7 +53,17 @@ public class TestGlobalDatabase implements GlobalDatabase {
     }
 
     @Override
+    public void register(String name) {
+
+    }
+
+    @Override
     public void unregister() {
+
+    }
+
+    @Override
+    public void unregister(String name) {
 
     }
 

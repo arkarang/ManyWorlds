@@ -23,7 +23,11 @@ public interface GlobalDatabase {
 
     void register();
 
+    void register(String name);
+
     void unregister();
+
+    void unregister(String name);
 
     Future<Void> registerWorld(BukkitView snapshot, WorldInfo info);
 
