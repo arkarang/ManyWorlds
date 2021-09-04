@@ -1,9 +1,8 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.github.luben.zstd.Zstd;
-import com.grinderwolf.swm.api.world.properties.SlimeProperties;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
 import com.minepalm.manyworlds.api.util.WorldBuffer;
@@ -18,7 +17,7 @@ public class WorldExtraDataStrategy implements WorldStrategy {
     @Override
     public WorldBuffer serialize(WorldOutputStream stream, WorldBuffer world) throws IOException {
 
-        byte[] extra = v1_12WorldUtils.serializeCompoundTag(world.getExtraData());
+        byte[] extra = WorldUtils.serializeCompoundTag(world.getExtraData());
         byte[] compressedExtra = Zstd.compress(extra);
 
         stream.writeInt(compressedExtra.length);
@@ -45,7 +44,7 @@ public class WorldExtraDataStrategy implements WorldStrategy {
         Zstd.decompress(extraTag, compressedExtraTag);
 
         // Extra Data
-        CompoundTag extraCompound = v1_12WorldUtils.readCompoundTag(extraTag);
+        CompoundTag extraCompound = WorldUtils.readCompoundTag(extraTag);
 
         if (extraCompound == null) {
             extraCompound = new CompoundTag("", new CompoundMap());

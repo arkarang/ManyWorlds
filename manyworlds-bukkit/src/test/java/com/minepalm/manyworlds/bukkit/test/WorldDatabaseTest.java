@@ -1,16 +1,9 @@
 package com.minepalm.manyworlds.bukkit.test;
 
-import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
-import com.grinderwolf.swm.api.exceptions.NewerFormatException;
-import com.grinderwolf.swm.api.utils.SlimeFormat;
-import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
-import com.minepalm.manyworlds.bukkit.CraftManyWorld;
 import com.minepalm.manyworlds.bukkit.ManyWorldLoader;
 import com.minepalm.manyworlds.bukkit.PreWorldData;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
-import com.minepalm.manyworlds.bukkit.strategies.v1_12.v1_12WorldUtils;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.WorldToken;
@@ -23,7 +16,6 @@ import org.junit.runners.MethodSorters;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;

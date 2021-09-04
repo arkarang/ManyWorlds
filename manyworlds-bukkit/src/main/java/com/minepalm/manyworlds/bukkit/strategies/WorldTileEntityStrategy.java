@@ -1,4 +1,4 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.flowpowered.nbt.*;
 import com.github.luben.zstd.Zstd;
@@ -21,7 +21,7 @@ public class WorldTileEntityStrategy implements WorldStrategy {
         List<CompoundTag> tileEntitiesList = buffer.getSortedChunks().stream().flatMap(chunk -> chunk.getTileEntities().stream()).collect(Collectors.toList());
         ListTag<CompoundTag> tileEntitiesNbtList = new ListTag<>("tiles", TagType.TAG_COMPOUND, tileEntitiesList);
         CompoundTag tileEntitiesCompound = new CompoundTag("", new CompoundMap(Collections.singletonList(tileEntitiesNbtList)));
-        byte[] tileEntitiesData = v1_12WorldUtils.serializeCompoundTag(tileEntitiesCompound);
+        byte[] tileEntitiesData = WorldUtils.serializeCompoundTag(tileEntitiesCompound);
         byte[] compressedTileEntitiesData = Zstd.compress(tileEntitiesData);
 
         stream.writeInt(compressedTileEntitiesData.length);
@@ -42,7 +42,7 @@ public class WorldTileEntityStrategy implements WorldStrategy {
         stream.read(compressedTileEntities);
         Zstd.decompress(tileEntities, compressedTileEntities);
 
-        CompoundTag tileEntitiesCompound = v1_12WorldUtils.readCompoundTag(tileEntities);
+        CompoundTag tileEntitiesCompound = WorldUtils.readCompoundTag(tileEntities);
 
         if (tileEntitiesCompound != null) {
             ListTag<CompoundTag> tileEntitiesList = (ListTag<CompoundTag>) tileEntitiesCompound.getValue().get("tiles");

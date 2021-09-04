@@ -1,4 +1,4 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.github.luben.zstd.Zstd;
 import com.grinderwolf.swm.api.world.SlimeChunk;
@@ -61,7 +61,7 @@ public class WorldChunkStrategy implements WorldStrategy {
             stream.writeInt(0);
         }
 
-        byte[] chunkData = v1_12WorldUtils.serializeChunks(list, buffer.getWorldVersion());
+        byte[] chunkData = WorldUtils.serializeChunks(list, buffer.getWorldVersion());
         byte[] compressedChunkData = Zstd.compress(chunkData);
 
         stream.writeInt(compressedChunkData.length);
@@ -97,7 +97,7 @@ public class WorldChunkStrategy implements WorldStrategy {
         Zstd.decompress(chunkData, compressedChunkData);
 
         // Chunk deserialization
-        Map<Long, SlimeChunk> chunks = v1_12WorldUtils.readChunks(buffer.getWorldVersion(), buffer.getVersion(), buffer.getName(), minX, minZ, width, depth, chunkBitset, chunkData);
+        Map<Long, SlimeChunk> chunks = WorldUtils.readChunks(buffer.getWorldVersion(), buffer.getVersion(), buffer.getName(), minX, minZ, width, depth, chunkBitset, chunkData);
 
         // v1_13 world format detection for old versions
         if (buffer.getVersion() == 0) {

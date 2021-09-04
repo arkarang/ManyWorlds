@@ -1,4 +1,4 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
@@ -25,7 +25,7 @@ public class WorldMapStrategy implements WorldStrategy {
 
             CompoundTag mapsCompound = new CompoundTag("", map);
 
-            byte[] mapArray = v1_12WorldUtils.serializeCompoundTag(mapsCompound);
+            byte[] mapArray = WorldUtils.serializeCompoundTag(mapsCompound);
             byte[] compressedMapArray = Zstd.compress(mapArray);
 
             stream.writeInt(compressedMapArray.length);
@@ -55,7 +55,7 @@ public class WorldMapStrategy implements WorldStrategy {
         Zstd.decompress(mapsTag, compressedMapsTag);
 
         // World Maps
-        CompoundTag mapsCompound = v1_12WorldUtils.readCompoundTag(mapsTag);
+        CompoundTag mapsCompound = WorldUtils.readCompoundTag(mapsTag);
         List<CompoundTag> mapList;
 
         if (mapsCompound != null) {

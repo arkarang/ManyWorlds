@@ -1,4 +1,4 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.flowpowered.nbt.*;
 import com.github.luben.zstd.Zstd;
@@ -23,7 +23,7 @@ public class WorldEntityStrategy implements WorldStrategy {
         if (!entitiesList.isEmpty()) {
             ListTag<CompoundTag> entitiesNbtList = new ListTag<>("entities", TagType.TAG_COMPOUND, entitiesList);
             CompoundTag entitiesCompound = new CompoundTag("", new CompoundMap(Collections.singletonList(entitiesNbtList)));
-            byte[] entitiesData = v1_12WorldUtils.serializeCompoundTag(entitiesCompound);
+            byte[] entitiesData = WorldUtils.serializeCompoundTag(entitiesCompound);
             byte[] compressedEntitiesData = Zstd.compress(entitiesData);
 
             stream.writeInt(compressedEntitiesData.length);
@@ -54,7 +54,7 @@ public class WorldEntityStrategy implements WorldStrategy {
         }
         Zstd.decompress(entities, compressedEntities);
 
-        CompoundTag entitiesCompound = v1_12WorldUtils.readCompoundTag(entities);
+        CompoundTag entitiesCompound = WorldUtils.readCompoundTag(entities);
 
         if (entitiesCompound != null) {
             ListTag<CompoundTag> entitiesList = (ListTag<CompoundTag>) entitiesCompound.getValue().get("entities");
@@ -62,8 +62,8 @@ public class WorldEntityStrategy implements WorldStrategy {
             for (CompoundTag entityCompound : entitiesList.getValue()) {
                 ListTag<DoubleTag> listTag = (ListTag<DoubleTag>) entityCompound.getAsListTag("Pos").get();
 
-                int chunkX = v1_12WorldUtils.floor(listTag.getValue().get(0).getValue()) >> 4;
-                int chunkZ = v1_12WorldUtils.floor(listTag.getValue().get(2).getValue()) >> 4;
+                int chunkX = WorldUtils.floor(listTag.getValue().get(0).getValue()) >> 4;
+                int chunkZ = WorldUtils.floor(listTag.getValue().get(2).getValue()) >> 4;
                 long chunkKey = ((long) chunkZ) * Integer.MAX_VALUE + ((long) chunkX);
                 SlimeChunk chunk = buffer.getChunks().get(chunkKey);
 

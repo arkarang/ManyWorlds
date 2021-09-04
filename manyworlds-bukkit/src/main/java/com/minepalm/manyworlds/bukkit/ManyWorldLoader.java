@@ -6,12 +6,10 @@ import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
-import com.minepalm.manyworlds.bukkit.strategies.v1_12.*;
+import com.minepalm.manyworlds.bukkit.strategies.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 
 import java.io.IOException;
 import java.util.HashMap;

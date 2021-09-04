@@ -1,4 +1,4 @@
-package com.minepalm.manyworlds.bukkit.strategies.v1_12;
+package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
