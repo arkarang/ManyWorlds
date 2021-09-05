@@ -1,6 +1,5 @@
-package com.minepalm.manyworlds.api.bukkit;
+package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 

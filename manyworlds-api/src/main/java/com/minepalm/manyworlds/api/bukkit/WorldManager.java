@@ -1,6 +1,5 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
 
 import java.util.concurrent.Future;
 
@@ -10,7 +9,7 @@ public interface WorldManager {
 
     WorldStorage getWorldStorage();
 
-    WorldLoader getWorldLoader(WorldType type) throws LoaderNotFoundException;
+    WorldLoader getWorldLoader(WorldType type);
 
     boolean registerWorldLoader(WorldType type, WorldLoader loader);
 

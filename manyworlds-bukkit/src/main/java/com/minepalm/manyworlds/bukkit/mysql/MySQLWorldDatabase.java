@@ -6,7 +6,7 @@ import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldType;
 import com.minepalm.manyworlds.bukkit.PreWorldData;
-import com.minepalm.manyworlds.api.errors.WorldNotExistsException;
+import com.minepalm.manyworlds.bukkit.errors.WorldNotExistsException;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.database.AbstractMySQL;

@@ -1,11 +1,11 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
 import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
+import com.minepalm.manyworlds.bukkit.strategies.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
+import com.minepalm.manyworlds.bukkit.errors.WorldCorruptedException;
 import com.minepalm.manyworlds.bukkit.strategies.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -94,7 +94,7 @@ public class ManyWorldLoader implements WorldLoader {
         if(info != null)
             return database.prepareWorld(info).get().getWorldBytes();
         else
-            throw new UnknownWorldException(s);
+            throw new WorldCorruptedException(s);
     }
 
     @Override
@@ -119,18 +119,18 @@ public class ManyWorldLoader implements WorldLoader {
     }
 
     @Override
-    public void unlockWorld(String s) throws UnknownWorldException, IOException {
+    public void unlockWorld(String s) throws IOException {
         //Do nothing.
     }
 
     @SneakyThrows
     @Override
-    public boolean isWorldLocked(String s) throws UnknownWorldException, IOException {
+    public boolean isWorldLocked(String s) throws IOException {
         return ManyWorlds.getCore().getGlobalDatabase().isWorldLoaded(s).get();
     }
 
     @Override
-    public void deleteWorld(String s) throws UnknownWorldException, IOException {
+    public void deleteWorld(String s) throws IOException {
         database.deleteWorld(s);
     }
 }

@@ -69,10 +69,14 @@ public class ManyWorldStorage implements WorldStorage {
                 Bukkit.getPluginManager().callEvent(event);
                 if(!event.isCancelled()) {
                     worlds.put(world.getName(), world);
-                    nms.generateWorld(world, genRegistry.get(world.getWorldInfo()));
+                    nms.generateWorld(world);
                     ManyWorlds.getGlobalDatabase().registerWorld(ManyWorlds.getInst(), world.getWorldInfo());
                     ManyWorlds.send(PacketFactory.newPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), true));
                     Bukkit.getPluginManager().callEvent(new ManyWorldLoadAfterEvent(world.getWorldInfo(), world));
+                    World bukkitWorld = Bukkit.getWorld(world.getName());
+                    if(bukkitWorld != null){
+                        bukkitWorld.save();
+                    }
                     after.run();
                 }
             });

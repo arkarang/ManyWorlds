@@ -1,12 +1,7 @@
 package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.TagType;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.*;
 import com.github.luben.zstd.Zstd;
-import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 

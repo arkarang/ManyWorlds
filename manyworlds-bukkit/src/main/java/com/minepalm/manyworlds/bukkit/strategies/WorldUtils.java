@@ -1,20 +1,13 @@
 package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.flowpowered.nbt.*;
-import com.flowpowered.nbt.stream.NBTInputStream;
-import com.flowpowered.nbt.stream.NBTOutputStream;
-import com.github.luben.zstd.Zstd;
-import com.grinderwolf.swm.api.exceptions.CorruptedWorldException;
-import com.grinderwolf.swm.api.exceptions.NewerFormatException;
-import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.utils.NibbleArray;
-import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.SlimeChunkSection;
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.*;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.stream.NBTInputStream;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.stream.NBTOutputStream;
 import com.grinderwolf.swm.nms.CraftSlimeChunk;
 import com.grinderwolf.swm.nms.CraftSlimeChunkSection;
-import com.grinderwolf.swm.nms.CraftSlimeWorld;
 
 
 import java.io.*;

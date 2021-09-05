@@ -42,14 +42,14 @@ public class ManyProperties implements WorldProperties {
     }
 
     public ManyProperties(SlimePropertyMap map){
-        spawnX = map.getInt(SlimeProperties.SPAWN_X);
-        spawnY = map.getInt(SlimeProperties.SPAWN_Y);
-        spawnZ = map.getInt(SlimeProperties.SPAWN_Z);
-        allowMonsters = map.getBoolean(SlimeProperties.ALLOW_MONSTERS);
-        allowAnimals = map.getBoolean(SlimeProperties.ALLOW_ANIMALS);
-        worldType = map.getString(SlimeProperties.WORLD_TYPE);
-        environment = map.getString(SlimeProperties.ENVIRONMENT);
-        difficulty = map.getString(SlimeProperties.DIFFICULTY);
+        spawnX = map.getValue(SlimeProperties.SPAWN_X);
+        spawnY = map.getValue(SlimeProperties.SPAWN_Y);
+        spawnZ = map.getValue(SlimeProperties.SPAWN_Z);
+        allowMonsters = map.getValue(SlimeProperties.ALLOW_MONSTERS);
+        allowAnimals = map.getValue(SlimeProperties.ALLOW_ANIMALS);
+        worldType = map.getValue(SlimeProperties.WORLD_TYPE);
+        environment = map.getValue(SlimeProperties.ENVIRONMENT);
+        difficulty = map.getValue(SlimeProperties.DIFFICULTY);
     }
 
     @Override

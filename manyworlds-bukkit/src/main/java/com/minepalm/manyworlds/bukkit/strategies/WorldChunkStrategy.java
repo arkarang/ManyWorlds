@@ -3,8 +3,6 @@ package com.minepalm.manyworlds.bukkit.strategies;
 import com.github.luben.zstd.Zstd;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.SlimeChunkSection;
-import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 

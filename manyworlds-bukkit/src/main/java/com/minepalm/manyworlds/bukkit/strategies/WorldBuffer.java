@@ -1,9 +1,9 @@
-package com.minepalm.manyworlds.api.util;
+package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.flowpowered.nbt.CompoundTag;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.api.world.SlimeChunk;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.CompoundTag;
 import com.minepalm.manyworlds.api.bukkit.LoadPhase;
 import lombok.Getter;
 import lombok.Setter;

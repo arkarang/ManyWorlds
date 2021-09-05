@@ -18,21 +18,21 @@ public class SlimePropertiesMapSerializer extends StdSerializer<SlimePropertyMap
     public void serialize(SlimePropertyMap map, JsonGenerator g, SerializerProvider p) throws IOException {
         g.writeStartObject();
         g.writeFieldName("SPAWN_X");
-        g.setCurrentValue(map.getInt(SlimeProperties.SPAWN_X));
+        g.setCurrentValue(map.getValue(SlimeProperties.SPAWN_X));
         g.writeFieldName("SPAWN_Y");
-        g.setCurrentValue(map.getInt(SlimeProperties.SPAWN_Y));
+        g.setCurrentValue(map.getValue(SlimeProperties.SPAWN_Y));
         g.writeFieldName("SPAWN_Z");
-        g.setCurrentValue(map.getInt(SlimeProperties.SPAWN_Z));
+        g.setCurrentValue(map.getValue(SlimeProperties.SPAWN_Z));
         g.writeFieldName("ALLOW_ANIMALS");
-        g.setCurrentValue(map.getBoolean(SlimeProperties.ALLOW_ANIMALS));
+        g.setCurrentValue(map.getValue(SlimeProperties.ALLOW_ANIMALS));
         g.writeFieldName("ALLOW_MONSTERS");
-        g.setCurrentValue(map.getBoolean(SlimeProperties.ALLOW_MONSTERS));
+        g.setCurrentValue(map.getValue(SlimeProperties.ALLOW_MONSTERS));
         g.writeFieldName("WORLD_TYPE");
-        g.setCurrentValue(map.getString(SlimeProperties.WORLD_TYPE));
+        g.setCurrentValue(map.getValue(SlimeProperties.WORLD_TYPE));
         g.writeFieldName("DIFFICULTY");
-        g.setCurrentValue(map.getString(SlimeProperties.DIFFICULTY));
+        g.setCurrentValue(map.getValue(SlimeProperties.DIFFICULTY));
         g.writeFieldName("ENVIRONMENT");
-        g.setCurrentValue(map.getString(SlimeProperties.ENVIRONMENT));
+        g.setCurrentValue(map.getValue(SlimeProperties.ENVIRONMENT));
         g.writeEndObject();
 
     }

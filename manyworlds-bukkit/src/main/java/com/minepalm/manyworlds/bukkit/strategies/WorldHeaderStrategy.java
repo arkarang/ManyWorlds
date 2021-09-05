@@ -1,8 +1,6 @@
 package com.minepalm.manyworlds.bukkit.strategies;
 
 import com.grinderwolf.swm.api.utils.SlimeFormat;
-import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 

@@ -4,12 +4,10 @@ import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.hellobungee.api.HelloClient;
 import com.minepalm.hellobungee.bukkit.HelloBukkit;
-import com.minepalm.hellobungee.bukkit.Listener;
 import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.GlobalDatabase;
 import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.WorldToken;
@@ -102,7 +100,7 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         return core.getWorldDatabase(type);
     }
 
-    public static WorldLoader getWorldLoader(WorldType type) throws LoaderNotFoundException {
+    public static WorldLoader getWorldLoader(WorldType type) {
         return core.getWorldLoader(type);
     }
 

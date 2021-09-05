@@ -1,11 +1,8 @@
 package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
 import com.github.luben.zstd.Zstd;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.*;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
-import com.minepalm.manyworlds.api.bukkit.WorldStrategy;
-import com.minepalm.manyworlds.api.util.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 
@@ -54,10 +51,12 @@ public class WorldExtraDataStrategy implements WorldStrategy {
 
         // World properties
         SlimePropertyMap worldPropertyMap = buffer.getPropertyMap();
-        Optional<CompoundTag> propertiesTag = buffer.getExtraData().getAsCompoundTag("properties");
+        Optional<CompoundMap> propertiesMap = extraCompound
+                .getAsCompoundTag("properties")
+                .map(CompoundTag::getValue);
 
-        if (propertiesTag.isPresent()) {
-            worldPropertyMap = SlimePropertyMap.fromCompound(propertiesTag.get());
+        if (propertiesMap.isPresent()) {
+            worldPropertyMap = new SlimePropertyMap(propertiesMap.get());
             worldPropertyMap.merge(buffer.getPropertyMap()); // Override world properties
         } else if (buffer.getPropertyMap() == null) { // Make sure the property map is never null
             worldPropertyMap = new SlimePropertyMap();

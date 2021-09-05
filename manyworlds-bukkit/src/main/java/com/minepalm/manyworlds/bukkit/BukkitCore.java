@@ -4,7 +4,6 @@ import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.manyworlds.api.GlobalDatabase;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.netty.Controller;
-import com.minepalm.manyworlds.api.errors.LoaderNotFoundException;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
 import com.minepalm.manyworlds.core.AbstractManyWorlds;
 import com.minepalm.manyworlds.core.WorldTokens;
@@ -88,11 +87,11 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     }
 
     @Override
-    public WorldLoader getWorldLoader(WorldType type) throws LoaderNotFoundException {
+    public WorldLoader getWorldLoader(WorldType type){
         if(loaders.containsKey(type))
             return loaders.get(type);
         else
-            throw new LoaderNotFoundException("loader (WorldType: "+type.getName()+") does not exists");
+            throw new IllegalArgumentException("loader (WorldType: "+type.getName()+") does not exists");
     }
 
     @Override
@@ -119,7 +118,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
                 CraftManyWorld mw = (CraftManyWorld) loader.deserialize(toUse);
                 mw.setLoader(getWorldLoader(info.getWorldType()));
                 worldStorage.registerWorld(mw, run);
-            }catch (IOException | InterruptedException | ExecutionException | LoaderNotFoundException e){
+            }catch (IOException | InterruptedException | ExecutionException e){
                 plugin.getLogger().severe("World "+info.getWorldName()+" could not be created by: "+ e.getMessage());
             }
             return null;
@@ -138,7 +137,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
                 worldStorage.registerWorld(loader.deserialize(preparedWorld), after);
-            }catch (IOException | InterruptedException | ExecutionException | LoaderNotFoundException e){
+            }catch (IOException | InterruptedException | ExecutionException  e){
                 plugin.getLogger().severe("World "+info.getWorldName()+" could not be loaded by: "+ e.getMessage());
             }
             return null;
