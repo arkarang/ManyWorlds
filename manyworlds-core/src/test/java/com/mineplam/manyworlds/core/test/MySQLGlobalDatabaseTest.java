@@ -27,7 +27,7 @@ public class MySQLGlobalDatabaseTest {
         db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor(), Logger.getGlobal());
     }
 
-    @Test
+   // @Test
     public void registerTest() throws ExecutionException, InterruptedException {
         db.register();
         Assert.assertNotNull(db.getServer("test").get());
@@ -35,7 +35,7 @@ public class MySQLGlobalDatabaseTest {
         Assert.assertNull(db.getServer("test").get());
     }
 
-    @Test
+   // @Test
     public void worldLoadedTest() throws ExecutionException, InterruptedException {
         Assert.assertFalse(db.isWorldLoaded("asdf").get());
     }
