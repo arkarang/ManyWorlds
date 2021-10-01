@@ -4,14 +4,16 @@ import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.manyworlds.api.GlobalDatabase;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.netty.Controller;
+import com.minepalm.manyworlds.bukkit.executors.WorldCreatePacketExecutor;
+import com.minepalm.manyworlds.bukkit.executors.WorldLoadPacketExecutor;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
 import com.minepalm.manyworlds.core.AbstractManyWorlds;
-import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
-import com.minepalm.manyworlds.core.netty.PacketFactory;
+import com.minepalm.manyworlds.core.WorldTokens;
+import com.minepalm.manyworlds.core.netty.ServerUpdatedPacket;
+import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -20,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 
 public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
@@ -40,8 +41,6 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
 
     @Getter
     final WorldStorage worldStorage;
-    @Getter
-    final ChunkGenRegistry generatorRegistry;
 
     BukkitCore(ManyWorlds plugin, GlobalDatabase globalDatabase, Controller controller) {
         super(plugin.getConf().getServerName(), globalDatabase, controller);
@@ -54,19 +53,21 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
         Conf conf = plugin.getConf();
         SWMPlugin swm = plugin.getSwm();
 
-        generatorRegistry = new ChunkGenRegistry();
-        worldStorage = new ManyWorldStorage(swm.getNms(), generatorRegistry,100);
+        worldStorage = new ManyWorldStorage(swm.getNms(), 100);
 
         WorldDatabase sampleDB, userDB;
         userDB = this.newMySQL(WorldTokens.USER, conf.getUserTableName());
         sampleDB = this.newMySQL(WorldTokens.SAMPLE, conf.getSampleTableName());
+
+        this.getController().register(new WorldCreatePacketExecutor(this));
+        this.getController().register(new WorldLoadPacketExecutor(this));
 
         registerWorldLoader(WorldTokens.SAMPLE, new ManyWorldLoader(sampleDB, worldStorage));
         registerWorldLoader(WorldTokens.USER, new ManyWorldLoader(userDB, worldStorage));
         
         globalDatabase.register();
         globalDatabase.resetWorlds(plugin);
-        this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createServerUpdated(true));
+        this.getController().send(new ServerUpdatedPacket(plugin, this.getGlobalDatabase().getProxy(), true));
 
     }
 
@@ -74,7 +75,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     public void shutdown(){
         this.getGlobalDatabase().unregister();
         worldStorage.shutdown();
-        this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createServerUpdated(false));
+        this.getController().send(new ServerUpdatedPacket(plugin, this.getGlobalDatabase().getProxy(), false));
     }
 
     @Override
@@ -137,8 +138,12 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
                 WorldLoader loader = getWorldLoader(info.getWorldType());
                 PreparedWorld preparedWorld = loader.getDatabase().prepareWorld(info).get();
                 worldStorage.registerWorld(loader.deserialize(preparedWorld), after);
-            }catch (IOException | InterruptedException | ExecutionException  e){
-                plugin.getLogger().severe("World "+info.getWorldName()+" could not be loaded by: "+ e.getMessage());
+            }catch (Exception  e){
+                plugin.getLogger().warning(e.getMessage());
+                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                    plugin.getLogger().warning(stackTraceElement.toString());
+                }
+                plugin.getLogger().severe("World "+info.getWorldName()+" could not be loaded by: "+e.getMessage());
             }
             return null;
         });
@@ -166,7 +171,7 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     public Future<Void> unload(String worldFullName) {
         return SERVICE.submit(()->{
             ManyWorld world = getWorldStorage().unregisterWorld(worldFullName);
-            this.getController().send(PacketFactory.newPacket(plugin, this.getGlobalDatabase().getProxy()).createWorldLoad(world.getWorldInfo(), false));
+            this.getController().send(new WorldLoadPacket(plugin, this.getGlobalDatabase().getProxy(), world.getWorldInfo(), false));
             return null;
         });
     }

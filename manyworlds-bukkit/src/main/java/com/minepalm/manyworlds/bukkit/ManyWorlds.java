@@ -3,20 +3,13 @@ package com.minepalm.manyworlds.bukkit;
 import co.aikar.commands.PaperCommandManager;
 import com.grinderwolf.swm.plugin.SWMPlugin;
 import com.minepalm.hellobungee.api.HelloClient;
+import com.minepalm.hellobungee.api.HelloEveryone;
 import com.minepalm.hellobungee.bukkit.HelloBukkit;
 import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.GlobalDatabase;
-import com.minepalm.manyworlds.api.ServerView;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
-import com.minepalm.manyworlds.core.ManyWorldInfo;
-import com.minepalm.manyworlds.core.WorldToken;
-import com.minepalm.manyworlds.core.WorldTokens;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
-import com.minepalm.manyworlds.core.netty.PacketFactory;
-import com.minepalm.manyworlds.core.netty.PacketResolver;
-import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
-import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -50,29 +43,15 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
         this.serverName = conf.getServerName();
 
+        HelloEveryone network = HelloBukkit.getInst().getMain();
         GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4), getLogger());
-        core = new BukkitCore(this, globalDatabase, new ProxyController(HelloBukkit.getConnections()));
-
-        PacketListener listener = new PacketListener(core, new PacketResolver(Executors.newSingleThreadExecutor(), getGlobalDatabase()));
-
-        listener.register(WorldCreatePacket.class, packet -> {
-            core.createNewWorld(new ManyWorldInfo(WorldTokens.USER, packet.getSampleName(), packet.getWorldName()));
-        });
-
-        listener.register(WorldLoadPacket.class, (packet) -> {
-            if(packet.isLoad()) {
-                if(Bukkit.getWorld(packet.getWorldName()) == null)
-                    core.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
-            }else {
-                if(Bukkit.getWorld(packet.getWorldName()) != null)
-                    core.unload(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
-            }
-        });
+        core = new BukkitCore(this, globalDatabase, new ProxyController(network));
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands());
 
-        Map<String, HelloClient> map = HelloBukkit.getConnections().getClients();
+        //todo: HelloBungee 1.5로 올릴때, 열려있는 서버 목록 모듈 옮겨놓기.
+        Map<String, HelloClient> map = network.getConnections().getClients();
         for (String key : map.keySet()) {
             HelloClient client = map.get(key);
             if(!client.isConnected()){
@@ -80,7 +59,6 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
             }
         }
 
-        Bukkit.getPluginManager().registerEvents(listener, this);
     }
 
     @Override
@@ -138,10 +116,6 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
 
     public static void send(WorldPacket packet){
         core.getController().send(packet);
-    }
-
-    public static PacketFactory newPacket(ServerView destination){
-        return PacketFactory.newPacket(inst, destination);
     }
 
     @Override

@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.minepalm</groupId>
             <artifactId>hellobungee-bungee</artifactId>
-            <version>1.3.0-SNAPSHOT</version>
+            <version>1.4.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

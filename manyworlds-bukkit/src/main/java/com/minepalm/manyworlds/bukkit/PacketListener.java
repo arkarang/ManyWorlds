@@ -7,7 +7,6 @@ import com.minepalm.manyworlds.core.netty.PacketExecutor;
 import com.minepalm.manyworlds.core.netty.PacketResolver;
 import com.minepalm.manyworlds.core.netty.exception.CorruptedPacketException;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

@@ -1,8 +1,8 @@
 package com.minepalm.manyworlds.bukkit.strategies;
 
-import com.grinderwolf.swm.internal.com.flowpowered.nbt.*;
 import com.github.luben.zstd.Zstd;
 import com.grinderwolf.swm.api.world.SlimeChunk;
+import com.grinderwolf.swm.internal.com.flowpowered.nbt.*;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 

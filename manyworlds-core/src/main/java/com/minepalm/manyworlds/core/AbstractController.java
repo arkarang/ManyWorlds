@@ -1,42 +1,29 @@
 package com.minepalm.manyworlds.core;
 
-import com.minepalm.hellobungee.api.HelloClient;
-import com.minepalm.hellobungee.api.HelloConnections;
+import com.minepalm.hellobungee.api.HelloEveryone;
+import com.minepalm.hellobungee.api.HelloExecutor;
 import com.minepalm.manyworlds.api.netty.Controller;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
-import com.minepalm.manyworlds.core.netty.PacketTypes;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.minepalm.manyworlds.core.netty.WorldCreatePacketAdapter;
+import com.minepalm.manyworlds.core.netty.WorldLoadPacketAdapter;
 
 public abstract class AbstractController implements Controller {
 
-    final HelloConnections connections;
-    final protected List<PacketTypes> canExecutes = new ArrayList<>();
+    protected final HelloEveryone network;
 
-    public AbstractController(HelloConnections connections){
-        this.connections = connections;
+    public AbstractController(HelloEveryone network){
+        this.network = network;
+        this.network.getGateway().registerAdapter(new WorldCreatePacketAdapter());
+        this.network.getGateway().registerAdapter(new WorldLoadPacketAdapter());
     }
 
     @Override
     public void send(WorldPacket packet) {
-        if(canExecute(packet.getPacketID())) {
-            Optional<HelloClient> optional = Optional.ofNullable(connections.getClient(packet.getTo().getServerName()));
-            if(optional.isPresent()){
-                HelloClient client = optional.get();
-                //todo: handling client not connected exception.
-                if(client.isConnected())
-                    client.sendData(packet);
-            }else{
-                throw new IllegalArgumentException("cannot find destination: "+packet.getTo());
-            }
-        }else
-            throw new IllegalArgumentException("cant execute packet type: "+packet.getClass().getSimpleName());
+        this.network.sender(packet.getTo().getServerName()).send(packet);
     }
 
     @Override
-    public boolean canExecute(byte packetID) {
-        return canExecutes.stream().anyMatch(pt->pt.index() == packetID);
+    public <T extends WorldPacket> void register(HelloExecutor<T> executor) {
+        network.getHandler().registerExecutor(executor);
     }
 }

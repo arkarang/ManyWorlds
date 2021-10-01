@@ -20,6 +20,7 @@ public class WorldHeaderStrategy implements WorldStrategy {
 
         // World version
         stream.writeByte(buffer.getWorldVersion());
+
         return buffer;
     }
 

@@ -2,7 +2,6 @@ package com.minepalm.manyworlds.bukkit;
 
 import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.bukkit.strategies.WorldBuffer;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 import com.minepalm.manyworlds.bukkit.errors.WorldCorruptedException;
@@ -35,6 +34,7 @@ public class ManyWorldLoader implements WorldLoader {
 
     @Override
     public ManyWorld deserialize(@NonNull PreparedWorld world) throws IOException {
+
         WorldBuffer buffer = new WorldBuffer();
 
         buffer.setName(world.getWorldInfo().getWorldName());

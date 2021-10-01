@@ -6,6 +6,7 @@ import com.grinderwolf.swm.api.world.SlimeChunkSection;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -56,7 +57,7 @@ public class WorldChunkStrategy implements WorldStrategy {
         int chunkMaskPadding = chunkMaskSize - array.length;
 
         for (int i = 0; i < chunkMaskPadding; i++) {
-            stream.writeInt(0);
+            stream.writeByte((byte)0);
         }
 
         byte[] chunkData = WorldUtils.serializeChunks(list, buffer.getWorldVersion());
@@ -88,6 +89,7 @@ public class WorldChunkStrategy implements WorldStrategy {
 
         int compressedChunkDataLength = stream.readInt();
         int chunkDataLength = stream.readInt();
+
         byte[] compressedChunkData = new byte[compressedChunkDataLength];
         byte[] chunkData = new byte[chunkDataLength];
 
@@ -113,6 +115,17 @@ public class WorldChunkStrategy implements WorldStrategy {
         buffer.setChunks(chunks);
 
         return buffer;
+    }
+
+    private static void writeBitSetAsBytes(DataOutputStream outStream, BitSet set, int fixedSize) throws IOException {
+        byte[] array = set.toByteArray();
+        outStream.write(array);
+
+        int chunkMaskPadding = fixedSize - array.length;
+
+        for (int i = 0; i < chunkMaskPadding; i++) {
+            outStream.write(0);
+        }
     }
 
 

@@ -1,7 +1,8 @@
 package com.minepalm.manyworlds.bukkit.test;
 
-import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.bukkit.ManyWorldLoader;
+import com.minepalm.manyworlds.api.bukkit.PreparedWorld;
+import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
+import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.bukkit.PreWorldData;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
 import com.minepalm.manyworlds.core.JsonWorldMetadata;
@@ -37,9 +38,10 @@ public class WorldDatabaseTest {
         db = new MySQLWorldDatabase(WorldTokens.SAMPLE, "manyworlds_world_data", props, Executors.newSingleThreadExecutor());
     }
 
+    /*
     @Test
     public void test_01_serializationTest() throws IOException {
-        RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");
+        RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test2.slime"), "rw");
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
 
@@ -61,6 +63,8 @@ public class WorldDatabaseTest {
 
         //Assert.assertEquals(pw.getWorldBytes(), bytes);
     }
+
+     */
 
     private PreparedWorld getPreparedWorld() throws IOException {
         RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");

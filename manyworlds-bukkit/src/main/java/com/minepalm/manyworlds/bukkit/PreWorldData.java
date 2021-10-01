@@ -5,7 +5,6 @@ import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.bukkit.WorldMetadata;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter

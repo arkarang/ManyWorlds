@@ -7,9 +7,9 @@ import com.minepalm.manyworlds.api.WorldLoadbalancer;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
 import com.minepalm.manyworlds.api.netty.Controller;
 import com.minepalm.manyworlds.core.AbstractManyWorlds;
-import com.minepalm.manyworlds.core.netty.PacketFactory;
+import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
+import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.Getter;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +32,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
         else
             throw new IllegalStateException("ProxyCore already exists");
         this.plugin = plugin;
+        controller.register(new WorldLoadPacketExecutor());
         super.getGlobalDatabase().register();
     }
 
@@ -53,7 +54,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
                     i = view.getLoadedWorlds();
                 }
             }
-            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldCreate(info.getSampleName(), info.getWorldName()));
+            this.getController().send(new WorldCreatePacket(plugin, least, info.getSampleName(), info.getWorldName()));
 
             return least;
         });
@@ -69,7 +70,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
                 least = least == null ? view : least;
                 least = i > view.getLoadedWorlds() ? view : least;
             }
-            this.getController().send(PacketFactory.newPacket(plugin, least).createWorldLoad(info, true));
+            this.getController().send(new WorldLoadPacket(plugin, least, info, true));
 
             return least;
         });
@@ -94,7 +95,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
     @Override
     public Future<Void> createSpecific(BukkitView view, WorldInfo info) {
         return EXECUTOR_SERVICE.submit(()->{
-            this.getController().send(PacketFactory.newPacket(plugin, view).createWorldCreate(info.getSampleName(), info.getWorldName()));
+            this.getController().send(new WorldCreatePacket(plugin, view, info.getSampleName(), info.getWorldName()));
             return null;
         });
     }
@@ -102,7 +103,7 @@ public class ProxyCore extends AbstractManyWorlds implements WorldLoadbalancer {
     @Override
     public Future<Void> loadSpecific(BukkitView view, WorldInfo info, boolean onOff) {
         return EXECUTOR_SERVICE.submit(()->{
-            this.getController().send(PacketFactory.newPacket(plugin, view).createWorldLoad(info, onOff));
+            this.getController().send(new WorldLoadPacket(plugin, view, info, onOff));
             return null;
         });
     }

@@ -1,13 +1,11 @@
 package com.mineplam.manyworlds.core.test;
 
-import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
 import com.minepalm.manyworlds.core.server.BungeeServerView;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;

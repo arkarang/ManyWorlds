@@ -8,7 +8,7 @@ import com.grinderwolf.swm.internal.com.flowpowered.nbt.stream.NBTInputStream;
 import com.grinderwolf.swm.internal.com.flowpowered.nbt.stream.NBTOutputStream;
 import com.grinderwolf.swm.nms.CraftSlimeChunk;
 import com.grinderwolf.swm.nms.CraftSlimeChunkSection;
-
+import org.bukkit.Bukkit;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -29,7 +29,7 @@ public class WorldUtils {
         }
     }
 
-    static byte[] serializeChunks(List<SlimeChunk> chunks, byte worldVersion) throws IOException {
+    public static byte[] serializeChunks(List<SlimeChunk> chunks, byte worldVersion) throws IOException {
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream(16384);
         DataOutputStream outStream = new DataOutputStream(outByteStream);
 
@@ -136,8 +136,10 @@ public class WorldUtils {
         return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
     }
 
-    static Map<Long, SlimeChunk> readChunks(byte worldVersion, int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
-        DataInputStream dataStream = new DataInputStream(new ByteArrayInputStream(chunkData));
+    public static Map<Long, SlimeChunk> readChunks(byte worldVersion, int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
+        Bukkit.getLogger().warning("chunkdata: "+chunkData.length);
+        ByteArrayInputStream bs = new ByteArrayInputStream(chunkData);
+        DataInputStream dataStream = new DataInputStream(bs);
         Map<Long, SlimeChunk> chunkMap = new HashMap<>();
 
         for (int z = 0; z < depth; z++) {

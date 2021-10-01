@@ -2,7 +2,6 @@ package com.minepalm.manyworlds.bungee;
 
 import com.minepalm.manyworlds.api.BukkitView;
 import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.api.bukkit.WorldType;
 import com.minepalm.manyworlds.core.ManyWorldInfo;
 import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.SneakyThrows;

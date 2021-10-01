@@ -1,6 +1,5 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface WorldStorage {
