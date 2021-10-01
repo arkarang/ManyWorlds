@@ -102,6 +102,14 @@ public class Commands extends BaseCommand {
     @Subcommand("등록")
     @Description("Slime World Manager 로부터 샘플 월드를 등록합니다.")
     public void register(CommandSender player, String SWMWorld, String name){
+        /*
+        1. SWM에서 mysql 설정을 킨다. (컨피그에 있음
+        2. SWM에서 월드를 하나 새로 판다.
+        3. 월드에 적절한 건축물을 복붙한다. (여따 FAWE 갈겨도 됨)
+        4. 그리고 월드를 언로드한다.
+        5. /월드버킷 등록 <월드명> <앞으로쓸 월드이름> 을 친다. 예) /월드버킷 등록 test123 island
+        -> 등록 성공!
+         */
         SlimeLoader loader = ManyWorlds.getInst().getSwm().getLoader("mysql");
         try {
             byte[] bytes;
