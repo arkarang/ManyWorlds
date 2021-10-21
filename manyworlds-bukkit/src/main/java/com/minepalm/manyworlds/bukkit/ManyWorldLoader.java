@@ -9,6 +9,7 @@ import com.minepalm.manyworlds.bukkit.strategies.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -114,8 +115,14 @@ public class ManyWorldLoader implements WorldLoader {
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
         ManyWorldStorage storage = (ManyWorldStorage) this.storage;
         ManyWorld world = storage.getLoadedWorld(s);
-        PreparedWorld pw = serialize(world);
-        database.saveWorld(pw);
+        Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()->{
+            try {
+                PreparedWorld pw = serialize(world);
+                database.saveWorld(pw);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

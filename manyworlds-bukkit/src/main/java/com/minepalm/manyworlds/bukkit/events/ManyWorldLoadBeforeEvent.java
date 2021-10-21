@@ -24,7 +24,7 @@ public class ManyWorldLoadBeforeEvent extends Event implements Cancellable {
 
     @Getter
     @Setter
-    public boolean cancelled;
+    public boolean cancelled = false;
 
     final WorldInfo worldInfo;
     final ManyWorld manyWorld;

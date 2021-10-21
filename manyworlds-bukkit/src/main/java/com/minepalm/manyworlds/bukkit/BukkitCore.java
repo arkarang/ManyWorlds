@@ -42,8 +42,8 @@ public class BukkitCore extends AbstractManyWorlds implements WorldManager{
     @Getter
     final WorldStorage worldStorage;
 
-    BukkitCore(ManyWorlds plugin, GlobalDatabase globalDatabase, Controller controller) {
-        super(plugin.getConf().getServerName(), globalDatabase, controller);
+    BukkitCore(ManyWorlds plugin, String name, GlobalDatabase globalDatabase, Controller controller) {
+        super(name, globalDatabase, controller);
         if (inst == null)
             inst = this;
         else

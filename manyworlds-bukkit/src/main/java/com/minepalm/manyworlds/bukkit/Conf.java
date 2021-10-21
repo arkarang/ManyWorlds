@@ -20,10 +20,6 @@ public class Conf extends SimpleConfig {
         return props;
     }
 
-    public String getServerName(){
-        return config.getString("ServerName");
-    }
-
     public String getServerTable(){
         return config.getString("Global.Servers");
     }

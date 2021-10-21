@@ -130,17 +130,18 @@ public class Commands extends BaseCommand {
     }
 
     @Subcommand("생성")
-    @Description("해당 샘플에 맞는 플레이어 개인 월드를 생성합니다.")
-    public void createOwn(Player player, String name){
-        WorldInfo info = new ManyWorldInfo(WorldTokens.USER, name, name+"_"+player.getUniqueId().toString());
+    @Description("해당 샘플에 맞는 월드를 생성합니다.")
+    public void create(Player player, String sample, String name){
+        WorldInfo info = new ManyWorldInfo(WorldTokens.USER, sample, name);
         ManyWorlds.createNewWorld(info);
         player.sendMessage("월드 생성 완료!");
     }
 
     @Subcommand("저장")
-    @Description("해당 샘플에 맞는 플레이어 개인 월드를 저장합니다.")
-    public void saveOwn(Player player, String name){
-        ManyWorlds.getWorldStorage().unregisterWorld(name+"_"+player.getUniqueId());
+    @Description("월드를 저장합니다.")
+    public void save(Player player, String name){
+        ManyWorlds.getWorldStorage().unregisterWorld(name);
+        ManyWorlds.unloadWorld(name);
         player.sendMessage("월드 저장 완료!");
     }
 }

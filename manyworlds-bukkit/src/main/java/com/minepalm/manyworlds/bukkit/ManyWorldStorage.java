@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,13 +90,15 @@ public class ManyWorldStorage implements WorldStorage {
             Optional<World> world = Optional.ofNullable(Bukkit.getWorld(mw.getWorldInfo().getWorldName()));
             if(world.isPresent()){
                 ManyWorldUnloadBeforeEvent event = new ManyWorldUnloadBeforeEvent(mw.getWorldInfo(), mw);
-                Bukkit.getPluginManager().callEvent(event);
-                if(!event.isCancelled()) {
-                    Bukkit.unloadWorld(world.get(), true);
-                    ManyWorlds.getGlobalDatabase().unregisterWorld(str);
-                    ManyWorlds.send(new WorldLoadPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy(), mw.getWorldInfo(), false));
-                    Bukkit.getPluginManager().callEvent(new ManyWorldUnloadAfterEvent(mw.getWorldInfo(), mw));
-                }
+                Bukkit.getScheduler().runTask(ManyWorlds.getInst(), ()->{
+                    Bukkit.getPluginManager().callEvent(event);
+                    if(!event.isCancelled()) {
+                        Bukkit.unloadWorld(world.get(), true);
+                        ManyWorlds.getGlobalDatabase().unregisterWorld(str);
+                        ManyWorlds.send(new WorldLoadPacket(ManyWorlds.getInst(), ManyWorlds.getGlobalDatabase().getProxy(), mw.getWorldInfo(), false));
+                        Bukkit.getPluginManager().callEvent(new ManyWorldUnloadAfterEvent(mw.getWorldInfo(), mw));
+                    }
+                });
             }
         }
         return mw;

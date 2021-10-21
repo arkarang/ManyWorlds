@@ -41,11 +41,11 @@ public class ManyWorlds extends JavaPlugin implements BukkitView {
         inst = this;
         conf = new Conf(this);
         swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
-        this.serverName = conf.getServerName();
 
         HelloEveryone network = HelloBukkit.getInst().getMain();
+        this.serverName = network.getName();
         GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4), getLogger());
-        core = new BukkitCore(this, globalDatabase, new ProxyController(network));
+        core = new BukkitCore(this, serverName, globalDatabase, new ProxyController(network));
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands());

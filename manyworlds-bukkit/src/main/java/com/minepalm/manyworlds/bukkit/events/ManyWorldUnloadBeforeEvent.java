@@ -21,7 +21,7 @@ public class ManyWorldUnloadBeforeEvent extends Event {
         return handlers;
     }
 
-    public boolean cancelled;
+    public boolean cancelled = false;
 
     final WorldInfo worldInfo;
     final ManyWorld manyWorld;

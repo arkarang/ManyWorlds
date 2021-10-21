@@ -1,11 +1,11 @@
 HelloBungee: 'proxy'
 ServerName: 'server1'
 Global:
-  Servers: '`manyworlds_servers`'
-  Worlds: '`manyworlds_worlds`'
+  Servers: 'manyworlds_servers'
+  Worlds: 'manyworlds_worlds'
 WorldDatabase:
-  USER: '`manyworlds_world_data`'
-  SAMPLE: '`manyworlds_samples`'
+  USER: 'manyworlds_world_data'
+  SAMPLE: 'manyworlds_samples'
 Database:
   address: '127.0.0.1'
   port: '3306'

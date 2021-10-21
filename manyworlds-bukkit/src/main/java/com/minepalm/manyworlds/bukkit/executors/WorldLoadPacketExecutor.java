@@ -24,8 +24,9 @@ public class WorldLoadPacketExecutor implements HelloExecutor<WorldLoadPacket> {
             if(Bukkit.getWorld(packet.getWorldName()) == null)
                 manager.loadWorld(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
         }else {
-            if(Bukkit.getWorld(packet.getWorldName()) != null)
+            if(Bukkit.getWorld(packet.getWorldName()) != null) {
                 manager.unload(new ManyWorldInfo(WorldToken.get(packet.getSampleName()), packet.getWorldName()));
+            }
         }
     }
 }
