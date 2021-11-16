@@ -1,18 +1,23 @@
 package com.minepalm.manyworlds.api.bukkit;
 
-import java.util.concurrent.Future;
+import com.minepalm.manyworlds.api.entity.WorldInform;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
+
+import java.util.concurrent.CompletableFuture;
 
 public interface WorldDatabase {
 
-    Future<PreparedWorld> prepareWorld(WorldInfo info);
+    WorldCategory getCategory();
 
-    Future<Void> saveWorld(PreparedWorld world);
+    CompletableFuture<PreparedWorld> prepareWorld(WorldInform info);
 
-    Future<WorldInfo> getWorldInfo(String fullName);
+    CompletableFuture<Void> saveWorld(PreparedWorld world);
 
-    Future<Void> deleteWorld(WorldInfo info);
+    CompletableFuture<Boolean> exists(WorldInform inform);
 
-    Future<Void> deleteWorld(String fullName);
+    CompletableFuture<Void> deleteWorld(WorldInform info);
+
+    CompletableFuture<Void> deleteWorld(String fullName);
 
 
 }

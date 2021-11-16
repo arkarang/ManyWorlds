@@ -1,5 +1,5 @@
-main: com.minepalm.manyworlds.bukkit.ManyWorlds
+main: com.minepalm.manyworlds.bukkit.ManyWorldsBukkitBootstrap
 name: ManyWorlds
-version: 1.0.0
+version: 1.1.0
 author: Arkarang
 depend: [SlimeWorldManager, HelloBukkit]

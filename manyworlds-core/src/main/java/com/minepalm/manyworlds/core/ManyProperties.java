@@ -52,7 +52,6 @@ public class ManyProperties implements WorldProperties {
         difficulty = map.getValue(SlimeProperties.DIFFICULTY);
     }
 
-    @Override
     public SlimePropertyMap asSlime() {
         SlimePropertyMap map = new SlimePropertyMap();
         map.setInt(SlimeProperties.SPAWN_X, spawnX);
@@ -65,21 +64,28 @@ public class ManyProperties implements WorldProperties {
         map.setString(SlimeProperties.DIFFICULTY, difficulty);
         return map;
     }
-
-    public static ManyProperties fromString(String json){
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(json, ManyProperties.class);
-        }catch (JsonProcessingException ignored){
-
-        }
-
-        return new ManyProperties();
-    }
-
     @Override
     public ManyProperties clone(){
         return new ManyProperties(this.asSlime());
+    }
+
+    public static ManyProperties fromJson(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, ManyProperties.class);
+    }
+    @Override
+    public String toString(){
+        return toJson();
+    }
+
+    public String toJson(){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        }catch (JsonProcessingException e){
+            e.printStackTrace();
+        }
+        return "";
     }
 
 }

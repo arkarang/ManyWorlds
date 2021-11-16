@@ -1,14 +1,11 @@
 package com.minepalm.manyworlds.bukkit.test;
 
-import com.minepalm.manyworlds.api.bukkit.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
-import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.bukkit.PreWorldData;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
-import com.minepalm.manyworlds.core.JsonWorldMetadata;
-import com.minepalm.manyworlds.core.ManyWorldInfo;
-import com.minepalm.manyworlds.core.WorldToken;
-import com.minepalm.manyworlds.core.WorldTokens;
+import com.minepalm.manyworlds.core.*;
+import com.minepalm.manyworlds.core.database.MySQLDatabase;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -25,7 +22,7 @@ import java.util.concurrent.Executors;
 public class WorldDatabaseTest {
 
     static WorldDatabase db;
-    static WorldInfo info;
+    static WorldInform info;
 
     @Test
     public void test_00_createTest(){
@@ -35,7 +32,7 @@ public class WorldDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLWorldDatabase(WorldTokens.SAMPLE, "manyworlds_world_data", props, Executors.newSingleThreadExecutor());
+        db = new MySQLWorldDatabase(WorldTokens.TYPE, "manyworlds_world_types", "manyworlds_world_data", new MySQLDatabase(props, Executors.newSingleThreadExecutor()));
     }
 
     /*
@@ -45,14 +42,14 @@ public class WorldDatabaseTest {
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
 
-        WorldLoader loader = new ManyWorldLoader(null, null);
+        WorldLoadService loader = new AbstractWorldLoadService(null, null);
 
         PreparedWorld pw = this.getPreparedWorld();
 
         for(int i = 0 ; i < 2 ; i++) {
             long now = System.currentTimeMillis();
-            ManyWorld world = loader.deserialize(pw);
-            Assert.assertNotNull(world.getWorldInfo());
+            WorldEntity world = loader.deserialize(pw);
+            Assert.assertNotNull(world.getWorldInform());
             Assert.assertNotNull(world.getMetadata());
             System.out.println("DESERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
 
@@ -70,22 +67,22 @@ public class WorldDatabaseTest {
         RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
-        return new PreWorldData(new ManyWorldInfo("test", 0L), bytes, new JsonWorldMetadata());
+        return new PreparedWorld(new WorldInform(WorldTokens.TYPE,"test", "test"), bytes, new ManyProperties());
     }
 
     @Test
     public void test_02_saveTest() throws IOException {
         PreparedWorld pWorld = getPreparedWorld();
         db.saveWorld(pWorld);
-        info = new ManyWorldInfo(WorldToken.get("SAMPLE"), "test", "test", 0L);
+        info = new WorldInform(WorldToken.get("SAMPLE"), "test", "test");
 
         Assert.assertNotNull(info);
-        Assert.assertEquals(info.getWorldName(), pWorld.getWorldInfo().getWorldName());
+        Assert.assertEquals(info.getName(), pWorld.getWorldInform().getName());
     }
 
     @Test
     public void test_03_loadTest() throws ExecutionException, InterruptedException {
-        info = new ManyWorldInfo(WorldToken.get("SAMPLE"), "test", "test", 0L);
+        info = new WorldInform(WorldToken.get("SAMPLE"), "test", "test");
         PreparedWorld world = db.prepareWorld(info).get();
         Assert.assertNotNull(world);
     }
@@ -100,7 +97,7 @@ public class WorldDatabaseTest {
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
 
-        WorldLoader loader = new ManyWorldLoader(null);
+        WorldLoadService loader = new AbstractWorldLoadService(null);
 
         PreparedWorld pw = this.getPreparedWorld();
 
@@ -121,15 +118,15 @@ public class WorldDatabaseTest {
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
 
-        WorldLoader loader = new ManyWorldLoader(null);
+        WorldLoadService loader = new AbstractWorldLoadService(null);
 
         PreparedWorld pw = this.getPreparedWorld();
 
         long now = System.currentTimeMillis();
 
         System.out.println("---------------------------------------------------------------------");
-        ManyWorld world = loader.deserialize(pw);
-        //Assert.assertNotNull(world.getWorldInfo());
+        WorldEntity world = loader.deserialize(pw);
+        //Assert.assertNotNull(world.getWorldInform());
         //Assert.assertNotNull(world.getMetadata());
         System.out.println("DESERIALIZATION TIME : " + (System.currentTimeMillis() - now) + "ms");
 

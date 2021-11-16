@@ -1,6 +1,6 @@
 package com.minepalm.manyworlds.core;
 
-import com.minepalm.manyworlds.api.bukkit.WorldType;
+import com.minepalm.manyworlds.api.bukkit.WorldCategory;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 @EqualsAndHashCode
-public class WorldToken implements WorldType {
+public class WorldToken implements WorldCategory {
 
     private static final HashMap<String, WorldToken> types = new HashMap<>();
 

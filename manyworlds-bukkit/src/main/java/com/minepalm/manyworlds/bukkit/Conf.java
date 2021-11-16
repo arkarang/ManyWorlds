@@ -6,7 +6,7 @@ import java.util.Properties;
 
 public class Conf extends SimpleConfig {
 
-    protected Conf(ManyWorlds plugin) {
+    protected Conf(ManyWorldsBukkitBootstrap plugin) {
         super(plugin, "config.yml");
     }
 

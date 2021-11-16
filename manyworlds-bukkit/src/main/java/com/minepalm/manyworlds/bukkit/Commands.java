@@ -8,13 +8,14 @@ import co.aikar.commands.annotation.Subcommand;
 import com.grinderwolf.swm.api.exceptions.UnknownWorldException;
 import com.grinderwolf.swm.api.exceptions.WorldInUseException;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
-import com.minepalm.manyworlds.api.BukkitView;
-import com.minepalm.manyworlds.api.BungeeView;
-import com.minepalm.manyworlds.api.bukkit.WorldInfo;
-import com.minepalm.manyworlds.core.JsonWorldMetadata;
-import com.minepalm.manyworlds.core.ManyWorldInfo;
+import com.grinderwolf.swm.plugin.SWMPlugin;
+import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import com.minepalm.manyworlds.api.entity.BukkitView;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.WorldInform;
+import com.minepalm.manyworlds.core.ManyProperties;
 import com.minepalm.manyworlds.core.WorldTokens;
-import org.bukkit.Bukkit;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -32,8 +33,13 @@ import java.util.concurrent.ExecutionException;
 * /월드 저장 <샘플 이름> - 샘플 월드를 저장합니다.
 * stop
 * */
+@RequiredArgsConstructor
 @CommandAlias("월드버킷")
 public class Commands extends BaseCommand {
+
+    private final ManyWorlds core;
+    private final SWMPlugin swm;
+    private final BukkitExecutor executor;
 
     @Default
     @Subcommand("도움말")
@@ -50,11 +56,11 @@ public class Commands extends BaseCommand {
     @Subcommand("전체")
     @Description("네트워크 전체에 로드되어 있는 정보를 봅니다.")
     public void allInfo(CommandSender sender){
-        Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()->{
+        executor.async(()->{
             try {
-                List<BukkitView> views = ManyWorlds.getGlobalDatabase().getServers().get();
+                List<BukkitView> views = core.getWorldNetwork().getServers().get();
                 for (BukkitView view : views) {
-                    for (String loadedWorld : ManyWorlds.getGlobalDatabase().getLoadedWorlds(view.getServerName()).get())
+                    for (String loadedWorld : ManyWorlds.getInst().getWorldNetwork().getLoadedWorlds(view.getServerName()).get())
                         sender.sendMessage("서버: " + view.getServerName() + " 월드: " + loadedWorld);
                 }
             }catch (InterruptedException | ExecutionException e) {
@@ -63,37 +69,27 @@ public class Commands extends BaseCommand {
         });
     }
 
-    @Subcommand("번지")
-    @Description("번지코드에 할당 되어 있는 정보를 봅니다.")
-    public void bungeeInfo(CommandSender player){
-        Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()-> {
-            BungeeView view = ManyWorlds.getGlobalDatabase().getProxy();
-            player.sendMessage("번지코드: "+view.getServerName());
-            player.sendMessage("번지코드 토탈 카운트: "+view.getTotalCount());
-        });
-    }
-
     @Subcommand("버킷")
     @Description("버킷에 할당되어 있는 정보를 봅니다.")
     public void bukkitInfo(CommandSender player, @Default("!Self") String name){
-        Bukkit.getScheduler().runTaskAsynchronously(ManyWorlds.getInst(), ()-> {
+        executor.async(()-> {
             BukkitView view;
 
             try {
                 if (name.equals("!Self")) {
-                    view = (BukkitView) ManyWorlds.getGlobalDatabase().getCurrentServer();
+                    view = core.asView();
                 } else {
-                    view = ManyWorlds.getGlobalDatabase().getBukkitServer(name).get();
+                    view = ManyWorlds.getInst().getWorldNetwork().getBukkitServer(name).get();
                 }
 
                 if (view == null) {
                     player.sendMessage("존재하지 않는 버킷입니다.");
                 } else {
                     player.sendMessage("버킷: " + view.getServerName());
-                    player.sendMessage("버킷 토탈 카운트: " + view.getLoadedWorlds());
+                    player.sendMessage("버킷 토탈 카운트: " + view.getWorldCounts());
                 }
             } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                e.printStackTrace();
             }
         });
 
@@ -110,7 +106,7 @@ public class Commands extends BaseCommand {
         5. /월드버킷 등록 <월드명> <앞으로쓸 월드이름> 을 친다. 예) /월드버킷 등록 test123 island
         -> 등록 성공!
          */
-        SlimeLoader loader = ManyWorlds.getInst().getSwm().getLoader("mysql");
+        SlimeLoader loader = swm.getLoader("mysql");
         try {
             byte[] bytes;
 
@@ -121,8 +117,8 @@ public class Commands extends BaseCommand {
                 return;
             }
 
-            WorldInfo info = new ManyWorldInfo(WorldTokens.SAMPLE, name, name);
-            ManyWorlds.getWorldDatabase(WorldTokens.SAMPLE).saveWorld(new PreWorldData(info, bytes, new JsonWorldMetadata()));
+            WorldInform info = new WorldInform(WorldTokens.TYPE, name, name);
+            core.getRegistry().getWorldDatabase(WorldTokens.TYPE).saveWorld(new PreparedWorld(info, bytes, new ManyProperties()));
             player.sendMessage("월드 저장 완료!");
         }catch (UnknownWorldException | IOException e){
             e.printStackTrace();
@@ -132,16 +128,16 @@ public class Commands extends BaseCommand {
     @Subcommand("생성")
     @Description("해당 샘플에 맞는 월드를 생성합니다.")
     public void create(Player player, String sample, String name){
-        WorldInfo info = new ManyWorldInfo(WorldTokens.USER, sample, name);
-        ManyWorlds.createNewWorld(info);
+        WorldInform info = new WorldInform(WorldTokens.USER, sample, name);
+        core.createNewWorld(info);
         player.sendMessage("월드 생성 완료!");
     }
 
     @Subcommand("저장")
     @Description("월드를 저장합니다.")
     public void save(Player player, String name){
-        ManyWorlds.getWorldStorage().unregisterWorld(name);
-        ManyWorlds.unloadWorld(name);
+        core.getWorldEntityStorage().unregisterWorld(name);
+        core.unload(name);
         player.sendMessage("월드 저장 완료!");
     }
 }

@@ -1,125 +1,116 @@
 package com.minepalm.manyworlds.bukkit;
 
-import co.aikar.commands.PaperCommandManager;
-import com.grinderwolf.swm.plugin.SWMPlugin;
-import com.minepalm.hellobungee.api.HelloClient;
-import com.minepalm.hellobungee.api.HelloEveryone;
-import com.minepalm.hellobungee.bukkit.HelloBukkit;
-import com.minepalm.manyworlds.api.BukkitView;
-import com.minepalm.manyworlds.api.GlobalDatabase;
+import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
+import com.minepalm.manyworlds.api.*;
 import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.entity.BukkitView;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.WorldInform;
+import com.minepalm.manyworlds.api.netty.Controller;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
-import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
-import lombok.AccessLevel;
+import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldTypeDatabase;
+import com.minepalm.manyworlds.bukkit.swm.SWMWorldFactory;
+import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.World;
 
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
-public class ManyWorlds extends JavaPlugin implements BukkitView {
-
-    @Getter
-    private static BukkitCore core;
+@Getter
+public class ManyWorlds implements WorldService {
 
     @Getter
     static ManyWorlds inst;
 
-    @Getter
-    String serverName;
+    final WorldLoadService loadService;
+    final WorldEntityStorage worldEntityStorage;
+    final WorldNetwork worldNetwork;
+    final Controller controller;
+    final WorldRegistry registry;
+    final BukkitExecutor executor;
 
     @Getter
-    private Conf conf;
+    final String serverName;
+    final Logger logger;
 
-    @Getter(AccessLevel.PACKAGE)
-    private SWMPlugin swm;
+    ManyWorlds(String name,
+               WorldNetwork worldNetwork,
+               WorldController controller,
+               WorldRegistry registry,
+               WorldEntityStorage storage,
+               WorldLoadService service,
+               BukkitExecutor executor,
+               Logger logger) {
+        if (inst == null)
+            inst = this;
+        else
+            throw new IllegalStateException("ManyWorlds already exists");
 
-    @Override
-    public void onEnable() {
-        inst = this;
-        conf = new Conf(this);
-        swm = ((SWMPlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager"));
+        this.serverName = name;
+        this.logger = logger;
+        this.worldNetwork = worldNetwork;
+        this.controller = controller;
+        this.registry = registry;
+        this.executor = executor;
+        this.loadService = service;
+        this.worldEntityStorage = storage;
+        
+        worldNetwork.registerServer();
+        worldNetwork.resetWorlds(this.asView());
 
-        HelloEveryone network = HelloBukkit.getInst().getMain();
-        this.serverName = network.getName();
-        GlobalDatabase globalDatabase = new MySQLGlobalDatabase(conf.proxyName(), this, conf.getServerTable(), conf.getWorldsTable(), conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4), getLogger());
-        core = new BukkitCore(this, serverName, globalDatabase, new ProxyController(network));
+    }
 
-        PaperCommandManager manager = new PaperCommandManager(this);
-        manager.registerCommand(new Commands());
+    public void shutdown(){
+        this.getWorldNetwork().unregister();
+        //registry.shutdown();
+        //worldEntityStorage.shutdown(loadService);
+    }
+    
+    public BukkitView asView(){
+        return new BukkitView(serverName, getWorldEntityStorage().getCounts());
+    }
 
-        //todo: HelloBungee 1.5로 올릴때, 열려있는 서버 목록 모듈 옮겨놓기.
-        Map<String, HelloClient> map = network.getConnections().getClients();
-        for (String key : map.keySet()) {
-            HelloClient client = map.get(key);
-            if(!client.isConnected()){
-                globalDatabase.unregister(key);
-            }
-        }
-
+    public void send(WorldPacket packet){
+        this.getController().send(packet);
     }
 
     @Override
-    public void onDisable() {
-        core.shutdown();
-    }
-
-    public static GlobalDatabase getGlobalDatabase(){
-        return core.getGlobalDatabase();
-    }
-
-    public static WorldStorage getWorldStorage(){
-        return core.getWorldStorage();
-    }
-
-    public static WorldDatabase getWorldDatabase(WorldType type) {
-        return core.getWorldDatabase(type);
-    }
-
-    public static WorldLoader getWorldLoader(WorldType type) {
-        return core.getWorldLoader(type);
-    }
-
-    public static Future<Void> createNewWorld(WorldInfo info) {
-        return core.createNewWorld(info);
-    }
-
-    public static Future<Void> createNewWorld(WorldInfo info, Runnable runAfter) {
-        return core.createNewWorld(info, runAfter);
-    }
-
-    public static Future<Void> loadWorld(WorldInfo info){
-        return core.loadWorld(info);
-    }
-
-    public static Future<Void> loadWorld(WorldInfo info, Runnable after){
-        return core.loadWorld(info, after);
-    }
-
-    public static Future<Void> save(WorldInfo info) {
-        return core.save(info);
-    }
-
-    public static Future<Void> save(String worldFullName) {
-        return core.save(worldFullName);
-    }
-
-    public static Future<Void> unloadWorld(WorldInfo info){
-        return core.unload(info);
-    }
-
-    public static Future<Void> unloadWorld(String name){
-        return core.unload(name);
-    }
-
-    public static void send(WorldPacket packet){
-        core.getController().send(packet);
+    public CompletableFuture<ManyWorld> createNewWorld(WorldInform info) {
+        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(WorldTokens.TYPE).prepareWorld(info);
+        CompletableFuture<WorldEntity> worldEntityFuture = preparedWorldFuture.thenCompose(loadService::loadWorld);
+        return worldEntityFuture.thenApply(worldEntity-> registry.register(info, worldEntity));
     }
 
     @Override
-    public int getLoadedWorlds() {
-        return getWorldStorage().getCounts();
+    public CompletableFuture<ManyWorld> loadWorld(WorldInform info) {
+        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(info.getWorldCategory()).prepareWorld(info);
+        CompletableFuture<WorldEntity> worldEntityFuture = preparedWorldFuture.thenCompose(loadService::loadWorld);
+        return worldEntityFuture.thenApply(worldEntity-> registry.register(info, worldEntity));
     }
+
+    @Override
+    public CompletableFuture<Boolean> save(WorldInform info) {
+        WorldEntity entity = worldEntityStorage.getLoadedWorld(info);
+        return loadService.unload(entity)
+                .thenCompose(preparedWorld -> executor.async(()-> registry.getWorldDatabase(info.getWorldCategory()).saveWorld(preparedWorld)))
+                .thenApply(Objects::nonNull);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> unload(WorldInform info) {
+        return executor.async(()->{
+            World world = Bukkit.getWorld(info.getName());
+            if(world != null) {
+                Bukkit.unloadWorld(world, true);
+                registry.unregister(info);
+                return true;
+            }else
+                return false;
+        });
+    }
+
+
 }

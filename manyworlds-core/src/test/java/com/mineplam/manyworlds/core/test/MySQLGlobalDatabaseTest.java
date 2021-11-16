@@ -1,10 +1,9 @@
 package com.mineplam.manyworlds.core.test;
 
-import com.minepalm.manyworlds.core.database.global.MySQLGlobalDatabase;
-import com.minepalm.manyworlds.core.server.BungeeServerView;
+import com.minepalm.manyworlds.api.entity.BungeeView;
+import com.minepalm.manyworlds.core.database.global.MySQLWorldNetwork;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -13,8 +12,8 @@ import java.util.logging.Logger;
 
 public class MySQLGlobalDatabaseTest {
 
-    private static BungeeServerView view = new BungeeServerView("test", 0);
-    private static MySQLGlobalDatabase db;
+    private static BungeeView view = new BungeeView("test", 0);
+    private static MySQLWorldNetwork db;
 
     @BeforeClass
     public static void prepare(){
@@ -24,12 +23,12 @@ public class MySQLGlobalDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLGlobalDatabase("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor(), Logger.getGlobal());
+        db = new MySQLWorldNetwork("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor(), Logger.getGlobal());
     }
 
    // @Test
     public void registerTest() throws ExecutionException, InterruptedException {
-        db.register();
+        db.registerServer();
         Assert.assertNotNull(db.getServer("test").get());
         db.unregister();
         Assert.assertNull(db.getServer("test").get());
