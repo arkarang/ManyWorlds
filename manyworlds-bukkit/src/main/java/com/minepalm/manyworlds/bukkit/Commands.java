@@ -136,7 +136,6 @@ public class Commands extends BaseCommand {
     @Subcommand("저장")
     @Description("월드를 저장합니다.")
     public void save(Player player, String name){
-        core.getWorldEntityStorage().unregisterWorld(name);
         core.unload(name);
         player.sendMessage("월드 저장 완료!");
     }

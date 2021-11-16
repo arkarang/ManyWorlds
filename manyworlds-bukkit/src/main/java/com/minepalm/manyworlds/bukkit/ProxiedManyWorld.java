@@ -10,67 +10,27 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class ProxiedManyWorld implements ManyWorld {
-
-    WorldNetwork worldNetwork;
-    WorldController controller;
-    WorldInform info;
+public class ProxiedManyWorld extends AbstractManyWorld {
 
     ProxiedManyWorld(@Nonnull WorldInform info, WorldNetwork worldNetwork, WorldController controller){
-        this.info = info;
-        this.worldNetwork = worldNetwork;
-        this.controller = controller;
-    }
-
-    @Override
-    public String getName() {
-        return info.getName();
-    }
-
-    @Override
-    public Optional<String> getType() {
-        return Optional.of(info.getType());
-    }
-
-    @Override
-    public WorldInform getWorldInfo() {
-        return info;
-    }
-
-    @Override
-    public CompletableFuture<Optional<BukkitView>> getLocated() {
-        return worldNetwork.getLoadedServer(this.info);
-    }
-
-    @Override
-    public CompletableFuture<Boolean> isLoaded() {
-        return worldNetwork.getLoadedServer(this.info).thenApply(Optional::isPresent);
-    }
-
-    @Override
-    public CompletableFuture<ServerView> load() {
-        return controller.loadAtLeast(this.info);
-    }
-
-    @Override
-    public CompletableFuture<ServerView> load(BukkitView server) {
-        return controller.updateSpecific(server, this.info, true).thenCompose(ManyWorld::getLocated).thenApply(Optional::get);
+        super(info, worldNetwork, controller);
     }
 
     @Override
     public CompletableFuture<ServerView> move(BukkitView view) {
-        worldNetwork.isWorldLoaded(this.info).thenApply(isLoaded->{
+        return worldNetwork.isWorldLoaded(this.info).thenCompose(isLoaded->{
             if(isLoaded){
-
-            }
-            return null;
+                return controller.unload(this.info)
+                        .thenCompose(completed->{
+                            if(completed) {
+                                return controller.load(view, this.info);
+                            }else
+                                return null;
+                        })
+                        .thenApply(mw->view);
+            }else
+                return controller.load(view, this.info).thenApply(mw->view);
         });
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Boolean> unload() {
-        return null;
     }
 
     @Override

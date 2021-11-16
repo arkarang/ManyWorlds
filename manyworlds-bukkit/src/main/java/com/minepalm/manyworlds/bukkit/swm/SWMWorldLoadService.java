@@ -7,10 +7,10 @@ import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.api.bukkit.WorldEntityStorage;
 import com.minepalm.manyworlds.api.bukkit.WorldFactory;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.bukkit.AbstractWorldLoadService;
-import lombok.RequiredArgsConstructor;
+import com.minepalm.manyworlds.bukkit.ManyWorlds;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 
@@ -26,9 +26,7 @@ public class SWMWorldLoadService extends AbstractWorldLoadService {
 
     @Override
     protected WorldEntity finalizeWorldLoad(WorldFactory factory, WorldEntity entity) {
-        SWMWorldEntity swmWorldEntity = (SWMWorldEntity) entity;
-        swmWorldEntity.setLoader((SWMWorldFactory)factory);
-        return swmWorldEntity;
+        return entity;
     }
 
     @Override

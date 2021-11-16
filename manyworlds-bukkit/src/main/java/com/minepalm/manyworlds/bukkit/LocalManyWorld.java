@@ -1,48 +1,30 @@
 package com.minepalm.manyworlds.bukkit;
 
 import com.minepalm.manyworlds.api.ManyWorld;
+import com.minepalm.manyworlds.api.WorldController;
+import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.bukkit.WorldCategory;
+import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
+import lombok.Getter;
+import lombok.NonNull;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class LocalManyWorld implements ManyWorld {
-    @Override
-    public String getName() {
-        return null;
-    }
+public class LocalManyWorld extends AbstractManyWorld {
 
-    @Override
-    public Optional<String> getType() {
-        return Optional.empty();
-    }
-
-    @Override
-    public WorldInform getWorldInfo() {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Optional<BukkitView>> getLocated() {
-        return null;
+    LocalManyWorld(@NonNull WorldInform info, WorldNetwork worldNetwork, WorldController controller) {
+        super(info, worldNetwork, controller);
     }
 
     @Override
     public CompletableFuture<Boolean> isLoaded() {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<ServerView> load() {
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<ServerView> load(BukkitView server) {
-        return null;
+        return CompletableFuture.completedFuture(Bukkit.getWorld(info.getName()) != null);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.minepalm.manyworlds.bukkit.swm;
 
+import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.minepalm.manyworlds.api.WorldProperties;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
@@ -16,8 +17,8 @@ public class SWMWorldEntity extends CraftSlimeWorld implements WorldEntity {
     @Getter
     WorldProperties properties;
 
-    public SWMWorldEntity(WorldFactory loader, WorldInform info, WorldBuffer buffer){
-        super((SWMWorldFactory)loader,
+    public SWMWorldEntity(SWMLoaderAdapter adapter, WorldInform info, WorldBuffer buffer){
+        super(adapter,
                 info.getName(),
                 buffer.getChunks(),
                 buffer.getExtraData(),

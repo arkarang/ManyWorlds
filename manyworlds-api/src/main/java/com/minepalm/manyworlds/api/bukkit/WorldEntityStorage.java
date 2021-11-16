@@ -18,7 +18,6 @@ public interface WorldEntityStorage {
 
     WorldEntity unregisterWorld(String name);
 
-
     int getCounts();
 
     int getMaximumCounts();
