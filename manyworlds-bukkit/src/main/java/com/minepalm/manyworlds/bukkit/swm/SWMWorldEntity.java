@@ -15,7 +15,7 @@ public class SWMWorldEntity extends CraftSlimeWorld implements WorldEntity {
     WorldInform worldInform;
 
     @Getter
-    WorldProperties properties;
+    WorldProperties worldProperties;
 
     public SWMWorldEntity(SWMLoaderAdapter adapter, WorldInform info, WorldBuffer buffer){
         super(adapter,

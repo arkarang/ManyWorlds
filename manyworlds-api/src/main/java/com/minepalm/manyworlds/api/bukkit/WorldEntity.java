@@ -7,6 +7,6 @@ public interface WorldEntity {
 
     WorldInform getWorldInform();
 
-    WorldProperties getProperties();
+    WorldProperties getWorldProperties();
 
 }

@@ -77,10 +77,10 @@ public class MySQLWorldDatabase implements WorldDatabase {
     public CompletableFuture<Void> saveWorld(PreparedWorld world){
         return database.executeAsync(con -> {
             PreparedStatement ps = con.prepareStatement("INSERT INTO " + table + " (`name`, `data`, `metadata`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `data`=?, `metadata`=?");
-            ps.setString(2, world.getWorldInform().getName());
+            ps.setString(1, world.getWorldInform().getName());
             for (int i = 0; i < 2; i++) {
-                ps.setBytes(3 + i * 2, world.getWorldBytes());
-                ps.setString(4 + i * 2, world.getProperties().toString());
+                ps.setBytes(2 + i * 2, world.getWorldBytes());
+                ps.setString(3 + i * 2, world.getProperties().toString());
             }
             ps.execute();
             return null;
@@ -89,7 +89,11 @@ public class MySQLWorldDatabase implements WorldDatabase {
 
     @Override
     public CompletableFuture<Boolean> exists(WorldInform inform) {
-        return null;
+        return database.executeAsync(con->{
+            PreparedStatement ps = con.prepareStatement("SELECT 1 FROM " + table + " WHERE `name`=?");
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        });
     }
 
     @Override

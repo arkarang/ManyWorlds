@@ -67,7 +67,7 @@ public abstract class AbstractWorldFactory implements WorldFactory {
         buffer.setName(world.getWorldInform().getName());
         buffer.setVersion(SlimeFormat.SLIME_VERSION);
         buffer.setWorldVersion(manyworld.getVersion()); // 여기
-        setProperties(buffer, world.getProperties());
+        setProperties(buffer, world.getWorldProperties());
         buffer.setChunks(manyworld.getChunks());
         buffer.setWorldMaps(manyworld.getWorldMaps());
         buffer.setExtraData(manyworld.getExtraData());
@@ -79,7 +79,7 @@ public abstract class AbstractWorldFactory implements WorldFactory {
             strategies.get(LoadPhase.getPhase(i)).serialize(stream, buffer);
         }
         buffer.setPhase(LoadPhase.END);
-        PreparedWorld preparedWorld = new PreparedWorld(world.getWorldInform(), stream.get(), world.getProperties());
+        PreparedWorld preparedWorld = new PreparedWorld(world.getWorldInform(), stream.get(), world.getWorldProperties());
 
         stream.close();
         buffer.release();

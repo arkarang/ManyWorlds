@@ -14,11 +14,6 @@ import java.util.concurrent.CompletableFuture;
 public class TestWorldNetwork implements WorldNetwork {
 
     @Override
-    public CompletableFuture<BungeeView> getProxy() {
-        return null;
-    }
-
-    @Override
     public ServerView getCurrentServer() {
         return new ServerView("test");
     }

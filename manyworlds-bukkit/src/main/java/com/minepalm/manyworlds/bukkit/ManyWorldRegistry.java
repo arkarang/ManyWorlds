@@ -58,6 +58,14 @@ public class ManyWorldRegistry implements WorldRegistry {
     }
 
     @Override
+    public CompletableFuture<Boolean> isExist(WorldInform inform) {
+        if(databases.containsKey(inform.getWorldCategory()))
+            return databases.get(inform.getWorldCategory()).exists(inform);
+        else
+            return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
     public CompletableFuture<Boolean> unregister(WorldInform inform) {
         WorldEntity entity = storage.unregisterWorld(inform.getName());
         if(entity != null)

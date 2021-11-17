@@ -60,8 +60,8 @@ public class ManyWorldsBukkitBootstrap extends JavaPlugin {
         database = new MySQLDatabase(conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
         worldDatabase = new MySQLDatabase(conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
         WorldDatabase sample, user;
-        sample = new MySQLWorldDatabase(conf.getSampleTableName(), worldDatabase);
-        user = new MySQLWorldDatabase(WorldTokens.USER, conf.getSampleTableName(), conf.getUserTableName(), worldDatabase);
+        sample = new MySQLWorldDatabase(WorldTokens.TYPE, conf.getSampleTableName(), worldDatabase);
+        user = new MySQLWorldDatabase(WorldTokens.USER, conf.getUserTableName(), worldDatabase);
         WorldNetwork worldNetwork = new MySQLWorldNetwork(conf.proxyName(), new ServerView(serverName), conf.getServerTable(), conf.getWorldsTable(), database, getLogger());
         WorldEntityStorage storage = new SWMWorldStorage(100, executor, swm.getNms());
         WorldController controller = new ManyWorldController(network, Executors.newCachedThreadPool(), worldNetwork);

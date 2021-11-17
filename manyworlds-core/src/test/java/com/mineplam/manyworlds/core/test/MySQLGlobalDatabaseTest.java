@@ -1,6 +1,7 @@
 package com.mineplam.manyworlds.core.test;
 
 import com.minepalm.manyworlds.api.entity.BungeeView;
+import com.minepalm.manyworlds.core.database.MySQLDatabase;
 import com.minepalm.manyworlds.core.database.global.MySQLWorldNetwork;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -23,7 +24,7 @@ public class MySQLGlobalDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLWorldNetwork("proxy", view, "manyworlds_servers", "manyworlds_worlds", props, Executors.newSingleThreadExecutor(), Logger.getGlobal());
+        db = new MySQLWorldNetwork("proxy", view, "manyworlds_servers", "manyworlds_worlds", new MySQLDatabase(props, Executors.newSingleThreadExecutor()), Logger.getGlobal());
     }
 
    // @Test
