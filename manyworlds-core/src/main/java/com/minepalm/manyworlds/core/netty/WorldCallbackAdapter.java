@@ -19,7 +19,7 @@ public class WorldCallbackAdapter{
 
         @Override
         public ManyWorld transform(WorldCreatePacket worldCreatePacket) {
-            return registry.getWorld(worldCreatePacket.getInform());
+            return registry.getWorld(worldCreatePacket.getWorldInform());
         }
     }
 
@@ -35,8 +35,39 @@ public class WorldCallbackAdapter{
 
         @Override
         public ManyWorld transform(WorldLoadPacket worldLoadPacket) {
-            return registry.getWorld(worldLoadPacket.getInform());
+            return registry.getWorld(worldLoadPacket.getWorldInform());
         }
     }
 
+    @RequiredArgsConstructor
+    public static class Move implements CallbackTransformer<WorldMovePacket, ManyWorld>{
+
+        final WorldRegistry registry;
+
+        @Override
+        public String getIdentifier() {
+            return WorldMovePacket.class.getSimpleName();
+        }
+
+        @Override
+        public ManyWorld transform(WorldMovePacket packet) {
+            return registry.getWorld(packet.getWorldInform());
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class Copy implements CallbackTransformer<WorldCopyPacket, ManyWorld>{
+
+        final WorldRegistry registry;
+
+        @Override
+        public String getIdentifier() {
+            return WorldCopyPacket.class.getSimpleName();
+        }
+
+        @Override
+        public ManyWorld transform(WorldCopyPacket packet) {
+            return registry.getWorld(packet.getWorldInform());
+        }
+    }
 }

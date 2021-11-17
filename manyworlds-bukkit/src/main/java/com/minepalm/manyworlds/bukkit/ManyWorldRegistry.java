@@ -7,6 +7,7 @@ import com.minepalm.manyworlds.api.WorldController;
 import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -29,9 +30,14 @@ public class ManyWorldRegistry implements WorldRegistry {
         WorldEntity entity = storage.getLoadedWorld(worldName);
         World world = Bukkit.getWorld(worldName);
         if(entity != null && world != null){
-            return new LocalManyWorld(entity.getWorldInform(), worldNetwork, controller);
+            return new LocalManyWorld(entity.getWorldInform(), this, worldNetwork, controller);
         }else
             return null;
+    }
+
+    @Override
+    public ManyWorld getWorld(WorldCategory category, String worldName) {
+        return new ProxiedManyWorld(new WorldInform(category, worldName), this, worldNetwork, controller);
     }
 
     @Override
@@ -39,15 +45,16 @@ public class ManyWorldRegistry implements WorldRegistry {
         WorldEntity entity = storage.getLoadedWorld(inform);
         World world = Bukkit.getWorld(inform.getName());
         if(entity != null && world != null){
-            return new LocalManyWorld(entity.getWorldInform(), worldNetwork, controller);
+            return new LocalManyWorld(entity.getWorldInform(), this, worldNetwork, controller);
         }else
-            return new ProxiedManyWorld(inform, worldNetwork, controller);
+            return new ProxiedManyWorld(inform, this, worldNetwork, controller);
     }
 
     @Override
-    public ManyWorld register(WorldInform inform, WorldEntity entity) {
+    public ManyWorld register(BukkitView view, WorldEntity entity) {
         storage.registerWorld(entity);
-        return null;
+        worldNetwork.registerWorld(view, entity.getWorldInform());
+        return new LocalManyWorld(entity.getWorldInform(), this, worldNetwork, controller);
     }
 
     @Override

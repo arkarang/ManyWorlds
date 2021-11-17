@@ -7,8 +7,11 @@ import lombok.Getter;
 @Getter
 public class WorldCreatePacket extends BasicPacket {
 
-    public WorldCreatePacket(ServerView from, ServerView to, WorldInform inform) {
-        super(from, to, inform);
+    WorldInform origin;
+
+    public WorldCreatePacket(WorldInform origin, WorldInform inform) {
+        super(inform);
+        this.origin = origin;
     }
 
 }

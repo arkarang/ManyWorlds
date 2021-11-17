@@ -24,7 +24,7 @@ public class ManyWorldController extends AbstractController implements WorldCont
     }
 
     @Override
-    public CompletableFuture<ServerView> createAtLeast(WorldInform info){
+    public CompletableFuture<ServerView> createAtLeast(WorldInform origin, WorldInform info){
         return worldNetwork.getServers().thenApplyAsync(servers->{
             BukkitView least = null;
             int i = 1000;
@@ -38,7 +38,7 @@ public class ManyWorldController extends AbstractController implements WorldCont
             }
 
             if(least != null)
-                send(new WorldCreatePacket(worldNetwork.getCurrentServer(), least, info));
+                send(least, new WorldCreatePacket(origin, info));
 
             return least;
         }, service);
@@ -56,7 +56,7 @@ public class ManyWorldController extends AbstractController implements WorldCont
             }
 
             if(least != null)
-                send(new WorldLoadPacket(worldNetwork.getCurrentServer(), least, info, true));
+                send(least, new WorldLoadPacket(info, true));
 
             return least;
         }, service);
@@ -78,19 +78,29 @@ public class ManyWorldController extends AbstractController implements WorldCont
     }
 
     @Override
-    public CompletableFuture<ManyWorld> createSpecific(BukkitView view, WorldInform info) {
-        return callback(new WorldCreatePacket(this.worldNetwork.getCurrentServer(), view, info));
+    public CompletableFuture<ManyWorld> createSpecific(BukkitView view, WorldInform origin, WorldInform info) {
+        return callback(view, new WorldCreatePacket(origin, info));
 
     }
 
     @Override
     public CompletableFuture<ManyWorld> updateSpecific(BukkitView view, WorldInform info, boolean onOff) {
-        return callback(new WorldLoadPacket(this.worldNetwork.getCurrentServer(), view, info, onOff));
+        return callback(view, new WorldLoadPacket(info, onOff));
     }
 
     @Override
     public CompletableFuture<ManyWorld> load(BukkitView view, WorldInform info) {
         return this.updateSpecific(view, info, true);
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> move(BukkitView view) {
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> copy(ManyWorld manyWorld) {
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override

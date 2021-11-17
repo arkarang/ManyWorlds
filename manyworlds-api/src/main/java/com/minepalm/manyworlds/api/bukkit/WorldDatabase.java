@@ -11,6 +11,8 @@ public interface WorldDatabase {
 
     CompletableFuture<PreparedWorld> prepareWorld(WorldInform info);
 
+    CompletableFuture<PreparedWorld> prepareWorld(String get, WorldInform override);
+
     CompletableFuture<Void> saveWorld(PreparedWorld world);
 
     CompletableFuture<Boolean> exists(WorldInform inform);

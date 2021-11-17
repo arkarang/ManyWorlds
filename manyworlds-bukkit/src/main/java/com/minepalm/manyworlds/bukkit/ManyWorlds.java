@@ -5,11 +5,9 @@ import com.minepalm.manyworlds.api.*;
 import com.minepalm.manyworlds.api.bukkit.*;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.api.netty.Controller;
-import com.minepalm.manyworlds.api.netty.WorldPacket;
-import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldTypeDatabase;
-import com.minepalm.manyworlds.bukkit.swm.SWMWorldFactory;
 import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -20,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 @Getter
-public class ManyWorlds implements WorldService {
+public class ManyWorlds extends BukkitView implements WorldService {
 
     @Getter
     static ManyWorlds inst;
@@ -44,6 +42,7 @@ public class ManyWorlds implements WorldService {
                WorldLoadService service,
                BukkitExecutor executor,
                Logger logger) {
+        super(name, 0);
         if (inst == null)
             inst = this;
         else
@@ -59,8 +58,13 @@ public class ManyWorlds implements WorldService {
         this.worldEntityStorage = storage;
         
         worldNetwork.registerServer();
-        worldNetwork.resetWorlds(this.asView());
+        worldNetwork.resetWorlds(this);
 
+    }
+
+    @Override
+    public int getWorldCounts() {
+        return worldEntityStorage.getCounts();
     }
 
     public void shutdown(){
@@ -70,25 +74,39 @@ public class ManyWorlds implements WorldService {
     }
     
     public BukkitView asView(){
-        return new BukkitView(serverName, getWorldEntityStorage().getCounts());
-    }
-
-    public void send(WorldPacket packet){
-        this.getController().send(packet);
+        return this;
     }
 
     @Override
-    public CompletableFuture<ManyWorld> createNewWorld(WorldInform info) {
-        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(WorldTokens.TYPE).prepareWorld(info);
-        CompletableFuture<WorldEntity> worldEntityFuture = preparedWorldFuture.thenCompose(loadService::loadWorld);
-        return worldEntityFuture.thenApply(worldEntity-> registry.register(info, worldEntity));
+    public ManyWorld get(WorldInform inform) {
+        return registry.getWorld(inform);
+    }
+
+    @Override
+    public ManyWorld get(WorldCategory category, String worldName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> createNewWorld(WorldInform origin, WorldInform info) {
+        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(origin.getWorldCategory()).prepareWorld(origin.getName(), info);
+        return preparedWorldFuture.thenCompose(preparedWorld->{
+            if(preparedWorld != null)
+                return loadService.loadWorld(preparedWorld).thenApply(worldEntity-> registry.register(this, worldEntity));
+            else
+                return CompletableFuture.completedFuture(null);
+        });
     }
 
     @Override
     public CompletableFuture<ManyWorld> loadWorld(WorldInform info) {
         CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(info.getWorldCategory()).prepareWorld(info);
-        CompletableFuture<WorldEntity> worldEntityFuture = preparedWorldFuture.thenCompose(loadService::loadWorld);
-        return worldEntityFuture.thenApply(worldEntity-> registry.register(info, worldEntity));
+        return preparedWorldFuture.thenCompose(preparedWorld->{
+            if(preparedWorld != null)
+                return loadService.loadWorld(preparedWorld).thenApply(worldEntity-> registry.register(this, worldEntity));
+            else
+                return CompletableFuture.completedFuture(null);
+        });
     }
 
     @Override
@@ -110,6 +128,18 @@ public class ManyWorlds implements WorldService {
             }else
                 return false;
         });
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> move(WorldInform inform, ServerView to) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> copy(WorldInform origin, WorldInform to) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
     }
 
 

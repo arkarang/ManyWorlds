@@ -3,6 +3,7 @@ package com.minepalm.manyworlds.bukkit;
 import com.minepalm.manyworlds.api.ManyWorld;
 import com.minepalm.manyworlds.api.WorldController;
 import com.minepalm.manyworlds.api.WorldNetwork;
+import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
@@ -13,12 +14,14 @@ import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractManyWorld implements ManyWorld{
 
+    WorldRegistry registry;
     WorldNetwork worldNetwork;
     WorldController controller;
     WorldInform info;
 
-    AbstractManyWorld(@Nonnull WorldInform info, WorldNetwork worldNetwork, WorldController controller){
+    AbstractManyWorld(@Nonnull WorldInform info, WorldRegistry registry, WorldNetwork worldNetwork, WorldController controller){
         this.info = info;
+        this.registry = registry;
         this.worldNetwork = worldNetwork;
         this.controller = controller;
     }
@@ -27,15 +30,34 @@ public abstract class AbstractManyWorld implements ManyWorld{
     public String getName() {
         return info.getName();
     }
-
-    @Override
-    public Optional<String> getType() {
-        return Optional.of(info.getType());
-    }
-
     @Override
     public WorldInform getWorldInfo() {
         return info;
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> create(@Nonnull BukkitView view, WorldInform inform) {
+        return isExists().thenCompose(exists->{
+            if(exists){
+                return controller.createSpecific(view, inform, info).thenApply(ignored-> this);
+            }else
+                return CompletableFuture.completedFuture(null);
+        });
+    }
+
+    @Override
+    public CompletableFuture<ManyWorld> create(WorldInform inform) {
+        return isExists().thenCompose(exists->{
+            if(exists){
+                return controller.createAtLeast(inform, info).thenApply(ignored-> this);
+            }else
+                return CompletableFuture.completedFuture(null);
+        });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> isExists() {
+        return this.registry.isExist(info);
     }
 
     @Override
@@ -54,7 +76,7 @@ public abstract class AbstractManyWorld implements ManyWorld{
             if(isLoaded){
                 return controller.loadAtLeast(this.info);
             }else{
-                return CompletableFuture.completedFuture(ManyWorlds.getInst().asView());
+                return CompletableFuture.completedFuture(ManyWorlds.getInst());
             }
         });
     }
@@ -65,7 +87,7 @@ public abstract class AbstractManyWorld implements ManyWorld{
             if(isLoaded){
                 return controller.updateSpecific(server, this.info, true).thenCompose(ManyWorld::getLocated).thenApply(Optional::get);
             }else{
-                return CompletableFuture.completedFuture(ManyWorlds.getInst().asView());
+                return CompletableFuture.completedFuture(ManyWorlds.getInst());
             }
         });
     }

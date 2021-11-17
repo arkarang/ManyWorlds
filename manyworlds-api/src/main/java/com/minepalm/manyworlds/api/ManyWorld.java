@@ -22,16 +22,28 @@ public interface ManyWorld {
     String getName();
 
     /**
-     * 본래 월드 샘플
-     * @return 본래 월드 샘플 이름
-     */
-    Optional<String> getType();
-
-    /**
      * 월드 정보
      * @return
      */
     WorldInform getWorldInfo();
+
+    /**
+     * 월드를 적당한 서버에 생성합니다.
+     * @param inform 로드할 월드 정보
+     * @return 새로 생성된 월드.
+     */
+    CompletableFuture<ManyWorld> create(WorldInform inform);
+
+    /**
+     * 월드를 해당 서버에 생성합니다.
+     */
+    CompletableFuture<ManyWorld> create(BukkitView view, WorldInform inform);
+
+    /**
+     * 월드가 데이터베이스에 존재하는지 확인합니다.
+     * @return 존재 여부.
+     */
+    CompletableFuture<Boolean> isExists();
 
     /**
      * 현재 로드되어있는 월드 위치입니다.
@@ -63,9 +75,9 @@ public interface ManyWorld {
      * IllegalArgumentException - 해당 서버로 월드를 이동시키지 못할 경우 발생합니다.
      * IllegalStateException - 월드를 해당 월드로 이동 시킬 수 없을 경우 발생합니다.
      * @param view 이동 시킬 월드 위치.
-     * @return 이동 된 월드 위치.
+     * @return 이동되고 난 뒤 새로운 월드 객체
      */
-    CompletableFuture<ServerView> move(BukkitView view);
+    CompletableFuture<ManyWorld> move(BukkitView view);
 
     /**
      * 로드 되어 있는 월드를 언로드 시킵니다.
@@ -77,10 +89,9 @@ public interface ManyWorld {
 
     /**
      * 월드를 복제해서 새로운 로드되지 않은 월드를 생성합니다.
-     * @param type 새로 생성될 월드의 타입.
-     * @param worldName 새로 생성될 월드의 이름.
+     * @param info 새로 생성될 월드 정보
      * @return 새로 생성된 월드.
      */
-    CompletableFuture<ManyWorld> copy(WorldCategory type, String worldName);
+    CompletableFuture<ManyWorld> copy(WorldInform info);
 
 }

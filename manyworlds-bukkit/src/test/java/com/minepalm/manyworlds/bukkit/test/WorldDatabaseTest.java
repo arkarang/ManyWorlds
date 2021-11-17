@@ -32,7 +32,7 @@ public class WorldDatabaseTest {
         props.setProperty("database", "test");
         props.setProperty("username", "root");
         props.setProperty("password", "test");
-        db = new MySQLWorldDatabase(WorldTokens.TYPE, "manyworlds_world_types", "manyworlds_world_data", new MySQLDatabase(props, Executors.newSingleThreadExecutor()));
+        db = new MySQLWorldDatabase(WorldTokens.TYPE, "manyworlds_samples", new MySQLDatabase(props, Executors.newSingleThreadExecutor()));
     }
 
     /*
@@ -67,14 +67,14 @@ public class WorldDatabaseTest {
         RandomAccessFile file = new RandomAccessFile(new File("src/test/resources/test.slime"), "rw");
         byte[] bytes = new byte[(int)file.length()];
         file.readFully(bytes);
-        return new PreparedWorld(new WorldInform(WorldTokens.TYPE,"test", "test"), bytes, new ManyProperties());
+        return new PreparedWorld(new WorldInform(WorldTokens.TYPE, "test"), bytes, new ManyProperties());
     }
 
     @Test
     public void test_02_saveTest() throws IOException {
         PreparedWorld pWorld = getPreparedWorld();
         db.saveWorld(pWorld);
-        info = new WorldInform(WorldToken.get("SAMPLE"), "test", "test");
+        info = new WorldInform(WorldToken.get("SAMPLE"), "test");
 
         Assert.assertNotNull(info);
         Assert.assertEquals(info.getName(), pWorld.getWorldInform().getName());
@@ -82,7 +82,7 @@ public class WorldDatabaseTest {
 
     @Test
     public void test_03_loadTest() throws ExecutionException, InterruptedException {
-        info = new WorldInform(WorldToken.get("SAMPLE"), "test", "test");
+        info = new WorldInform(WorldToken.get("SAMPLE"), "test");
         PreparedWorld world = db.prepareWorld(info).get();
         Assert.assertNotNull(world);
     }

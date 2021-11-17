@@ -12,12 +12,15 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProxiedManyWorld extends AbstractManyWorld {
 
-    ProxiedManyWorld(@Nonnull WorldInform info, WorldNetwork worldNetwork, WorldController controller){
-        super(info, worldNetwork, controller);
+    ProxiedManyWorld(@Nonnull WorldInform info, WorldRegistry registry, WorldNetwork worldNetwork, WorldController controller){
+        super(info, registry, worldNetwork, controller);
     }
 
     @Override
-    public CompletableFuture<ServerView> move(BukkitView view) {
+    public CompletableFuture<ManyWorld> move(BukkitView view) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
+        /*
         return worldNetwork.isWorldLoaded(this.info).thenCompose(isLoaded->{
             if(isLoaded){
                 return controller.unload(this.info)
@@ -25,16 +28,19 @@ public class ProxiedManyWorld extends AbstractManyWorld {
                             if(completed) {
                                 return controller.load(view, this.info);
                             }else
-                                return null;
+                                return CompletableFuture.completedFuture(null);
                         })
                         .thenApply(mw->view);
             }else
                 return controller.load(view, this.info).thenApply(mw->view);
         });
+
+         */
     }
 
     @Override
-    public CompletableFuture<ManyWorld> copy(WorldCategory type, String worldName) {
-        return null;
+    public CompletableFuture<ManyWorld> copy(WorldInform inform) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
     }
 }

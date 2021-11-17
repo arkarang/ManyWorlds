@@ -16,18 +16,14 @@ public class WorldLoadPacketAdapter implements HelloAdapter<WorldLoadPacket> {
 
     @Override
     public void encode(ByteBuf buf, WorldLoadPacket packet) {
-        ByteBufUtils.writeString(buf, packet.getFrom().getServerName());
-        ByteBufUtils.writeString(buf, packet.getTo().getServerName());
-        BasicPacket.write(buf, packet.getInform());
+        BasicPacket.write(buf, packet.getWorldInform());
         buf.writeBoolean(packet.isLoad());
     }
 
     @Override
     public WorldLoadPacket decode(ByteBuf buf) {
-        String from = ByteBufUtils.readString(buf);
-        String to = ByteBufUtils.readString(buf);
         WorldInform inform = BasicPacket.read(buf);
         boolean load = buf.readBoolean();
-        return new WorldLoadPacket(new ServerView(from), new ServerView(to), inform, load);
+        return new WorldLoadPacket(inform, load);
     }
 }

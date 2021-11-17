@@ -1,11 +1,9 @@
 package com.minepalm.manyworlds.api.netty;
 
-import com.minepalm.manyworlds.api.entity.ServerView;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 
 public interface WorldPacket {
 
-    ServerView getFrom();
-
-    ServerView getTo();
+    WorldInform getWorldInform();
 
 }

@@ -3,6 +3,7 @@ package com.minepalm.manyworlds.bukkit;
 import com.minepalm.manyworlds.api.ManyWorld;
 import com.minepalm.manyworlds.api.WorldController;
 import com.minepalm.manyworlds.api.WorldNetwork;
+import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.bukkit.WorldCategory;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.api.entity.BukkitView;
@@ -18,8 +19,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class LocalManyWorld extends AbstractManyWorld {
 
-    LocalManyWorld(@NonNull WorldInform info, WorldNetwork worldNetwork, WorldController controller) {
-        super(info, worldNetwork, controller);
+    LocalManyWorld(@NonNull WorldInform info, WorldRegistry registry, WorldNetwork worldNetwork, WorldController controller) {
+        super(info, registry, worldNetwork, controller);
     }
 
     @Override
@@ -28,17 +29,15 @@ public class LocalManyWorld extends AbstractManyWorld {
     }
 
     @Override
-    public CompletableFuture<ServerView> move(BukkitView view) {
-        return null;
+    public CompletableFuture<ManyWorld> move(BukkitView view) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
-    public CompletableFuture<Boolean> unload() {
-        return null;
+    public CompletableFuture<ManyWorld> copy(WorldInform info) {
+        //todo: implements this
+        throw new UnsupportedOperationException("not implemented");
     }
 
-    @Override
-    public CompletableFuture<ManyWorld> copy(WorldCategory type, String worldName) {
-        return null;
-    }
 }

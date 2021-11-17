@@ -9,8 +9,8 @@ public class WorldLoadPacket extends BasicPacket{
 
     private final boolean load;
 
-    public WorldLoadPacket(ServerView from, ServerView to, WorldInform info, boolean load) {
-        super(from, to, info);
+    public WorldLoadPacket(WorldInform info, boolean load) {
+        super(info);
         this.load = load;
     }
 

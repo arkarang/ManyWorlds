@@ -2,6 +2,7 @@ package com.minepalm.manyworlds.core;
 
 import com.minepalm.hellobungee.api.HelloEveryone;
 import com.minepalm.manyworlds.api.ManyWorld;
+import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.netty.Controller;
 import com.minepalm.manyworlds.api.netty.WorldPacket;
 
@@ -21,12 +22,12 @@ public abstract class AbstractController implements Controller {
     }
 
     @Override
-    public void send(WorldPacket packet) {
-        this.network.sender(packet.getTo().getServerName()).send(packet);
+    public void send(ServerView view, WorldPacket packet) {
+        this.network.sender(view.getServerName()).send(packet);
     }
 
-    public CompletableFuture<ManyWorld> callback(WorldPacket packet){
-        return this.network.sender(packet.getTo().getServerName()).callback(packet, ManyWorld.class).async();
+    public CompletableFuture<ManyWorld> callback(ServerView view, WorldPacket packet){
+        return this.network.sender(view.getServerName()).callback(packet, ManyWorld.class).async();
     }
 
 }

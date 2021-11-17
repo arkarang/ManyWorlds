@@ -13,7 +13,6 @@ import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
 import com.minepalm.manyworlds.bukkit.executors.WorldCreatePacketExecutor;
 import com.minepalm.manyworlds.bukkit.executors.WorldLoadPacketExecutor;
 import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldDatabase;
-import com.minepalm.manyworlds.bukkit.mysql.MySQLWorldTypeDatabase;
 import com.minepalm.manyworlds.bukkit.swm.SWMWorldFactory;
 import com.minepalm.manyworlds.bukkit.swm.SWMWorldLoadService;
 import com.minepalm.manyworlds.bukkit.swm.SWMWorldStorage;
@@ -61,7 +60,7 @@ public class ManyWorldsBukkitBootstrap extends JavaPlugin {
         database = new MySQLDatabase(conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
         worldDatabase = new MySQLDatabase(conf.getDatabaseProperties(), Executors.newScheduledThreadPool(4));
         WorldDatabase sample, user;
-        sample = new MySQLWorldTypeDatabase(conf.getSampleTableName(), worldDatabase);
+        sample = new MySQLWorldDatabase(conf.getSampleTableName(), worldDatabase);
         user = new MySQLWorldDatabase(WorldTokens.USER, conf.getSampleTableName(), conf.getUserTableName(), worldDatabase);
         WorldNetwork worldNetwork = new MySQLWorldNetwork(conf.proxyName(), new ServerView(serverName), conf.getServerTable(), conf.getWorldsTable(), database, getLogger());
         WorldEntityStorage storage = new SWMWorldStorage(100, executor, swm.getNms());
@@ -79,9 +78,12 @@ public class ManyWorldsBukkitBootstrap extends JavaPlugin {
         network.getHandler().registerExecutor(new WorldLoadPacketExecutor(core));
         network.getCallbackService().registerTransformer(new WorldCallbackAdapter.Create(registry));
         network.getCallbackService().registerTransformer(new WorldCallbackAdapter.Update(registry));
+        network.getCallbackService().registerTransformer(new WorldCallbackAdapter.Move(registry));
+        network.getCallbackService().registerTransformer(new WorldCallbackAdapter.Copy(registry));
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.registerCommand(new Commands(core, swm, executor));
+        manager.registerCommand(new BungeeCommands(core));
 
         //todo: HelloBungee 1.5로 올릴때, 열려있는 서버 목록 모듈 옮겨놓기.
         Map<String, HelloClient> map = network.getConnections().getClients();

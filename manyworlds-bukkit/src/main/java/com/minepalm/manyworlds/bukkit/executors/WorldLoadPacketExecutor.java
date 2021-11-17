@@ -2,8 +2,6 @@ package com.minepalm.manyworlds.bukkit.executors;
 
 import com.minepalm.hellobungee.api.HelloExecutor;
 import com.minepalm.manyworlds.api.WorldService;
-import com.minepalm.manyworlds.api.entity.WorldInform;
-import com.minepalm.manyworlds.core.WorldToken;
 import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -21,11 +19,11 @@ public class WorldLoadPacketExecutor implements HelloExecutor<WorldLoadPacket> {
     @Override
     public void executeReceived(WorldLoadPacket packet) {
         if(packet.isLoad()) {
-            if(Bukkit.getWorld(packet.getInform().getName()) == null)
-                manager.loadWorld(packet.getInform());
+            if(Bukkit.getWorld(packet.getWorldInform().getName()) == null)
+                manager.loadWorld(packet.getWorldInform());
         }else {
-            if(Bukkit.getWorld(packet.getInform().getName()) != null) {
-                manager.unload(packet.getInform());
+            if(Bukkit.getWorld(packet.getWorldInform().getName()) != null) {
+                manager.unload(packet.getWorldInform());
             }
         }
     }

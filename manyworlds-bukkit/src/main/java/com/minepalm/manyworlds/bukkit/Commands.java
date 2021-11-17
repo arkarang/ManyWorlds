@@ -74,10 +74,9 @@ public class Commands extends BaseCommand {
     public void bukkitInfo(CommandSender player, @Default("!Self") String name){
         executor.async(()-> {
             BukkitView view;
-
             try {
                 if (name.equals("!Self")) {
-                    view = core.asView();
+                    view = core;
                 } else {
                     view = ManyWorlds.getInst().getWorldNetwork().getBukkitServer(name).get();
                 }
@@ -117,7 +116,7 @@ public class Commands extends BaseCommand {
                 return;
             }
 
-            WorldInform info = new WorldInform(WorldTokens.TYPE, name, name);
+            WorldInform info = new WorldInform(WorldTokens.TYPE, name);
             core.getRegistry().getWorldDatabase(WorldTokens.TYPE).saveWorld(new PreparedWorld(info, bytes, new ManyProperties()));
             player.sendMessage("월드 저장 완료!");
         }catch (UnknownWorldException | IOException e){
@@ -125,18 +124,4 @@ public class Commands extends BaseCommand {
         }
     }
 
-    @Subcommand("생성")
-    @Description("해당 샘플에 맞는 월드를 생성합니다.")
-    public void create(Player player, String sample, String name){
-        WorldInform info = new WorldInform(WorldTokens.USER, sample, name);
-        core.createNewWorld(info);
-        player.sendMessage("월드 생성 완료!");
-    }
-
-    @Subcommand("저장")
-    @Description("월드를 저장합니다.")
-    public void save(Player player, String name){
-        core.unload(name);
-        player.sendMessage("월드 저장 완료!");
-    }
 }

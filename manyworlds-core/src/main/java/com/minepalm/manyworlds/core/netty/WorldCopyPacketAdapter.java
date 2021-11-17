@@ -6,23 +6,24 @@ import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import io.netty.buffer.ByteBuf;
 
-public class WorldCreatePacketAdapter implements HelloAdapter<WorldCreatePacket> {
+public class WorldCopyPacketAdapter implements HelloAdapter<WorldCopyPacket> {
 
     @Override
     public String getIdentifier() {
-        return WorldCreatePacket.class.getSimpleName();
+        return WorldCopyPacket.class.getSimpleName();
     }
 
+
     @Override
-    public void encode(ByteBuf buf, WorldCreatePacket packet) {
-        BasicPacket.write(buf, packet.getOrigin());
+    public void encode(ByteBuf buf, WorldCopyPacket packet) {
         BasicPacket.write(buf, packet.getWorldInform());
+        BasicPacket.write(buf, packet.getToCopy());
     }
 
     @Override
-    public WorldCreatePacket decode(ByteBuf buf) {
-        WorldInform origin = BasicPacket.read(buf);
+    public WorldCopyPacket decode(ByteBuf buf) {
         WorldInform inform = BasicPacket.read(buf);
-        return new WorldCreatePacket(origin, inform);
+        WorldInform toCopy = BasicPacket.read(buf);
+        return new WorldCopyPacket( inform, toCopy);
     }
 }

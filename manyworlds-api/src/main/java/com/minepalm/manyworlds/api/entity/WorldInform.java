@@ -15,9 +15,6 @@ public class WorldInform {
     final WorldCategory worldCategory;
 
     @NonNull
-    private final String type;
-
-    @NonNull
     private final String name;
 
 }
