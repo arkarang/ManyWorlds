@@ -16,6 +16,12 @@ public interface WorldService {
 
     WorldEntityStorage getWorldEntityStorage();
 
+    WorldNetwork getWorldNetwork();
+
+    WorldRegistry getWorldRegistry();
+
+    WorldController getWorldController();
+
     ManyWorld get(WorldInform inform);
 
     ManyWorld get(WorldCategory category, String worldName);

@@ -27,8 +27,8 @@ public class ManyWorlds extends BukkitView implements WorldService {
     final WorldLoadService loadService;
     final WorldEntityStorage worldEntityStorage;
     final WorldNetwork worldNetwork;
-    final Controller controller;
-    final WorldRegistry registry;
+    final Controller worldController;
+    final WorldRegistry worldRegistry;
     final BukkitExecutor executor;
 
     @Getter
@@ -52,8 +52,8 @@ public class ManyWorlds extends BukkitView implements WorldService {
         this.serverName = name;
         this.logger = logger;
         this.worldNetwork = worldNetwork;
-        this.controller = controller;
-        this.registry = registry;
+        this.worldController = controller;
+        this.worldRegistry = registry;
         this.executor = executor;
         this.loadService = service;
         this.worldEntityStorage = storage;
@@ -80,7 +80,7 @@ public class ManyWorlds extends BukkitView implements WorldService {
 
     @Override
     public ManyWorld get(WorldInform inform) {
-        return registry.getWorld(inform);
+        return worldRegistry.getWorld(inform);
     }
 
     @Override
@@ -90,11 +90,11 @@ public class ManyWorlds extends BukkitView implements WorldService {
 
     @Override
     public CompletableFuture<ManyWorld> createNewWorld(WorldInform origin, WorldInform info) {
-        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(origin.getWorldCategory()).prepareWorld(origin.getName(), info);
+        CompletableFuture<PreparedWorld> preparedWorldFuture = worldRegistry.getWorldDatabase(origin.getWorldCategory()).prepareWorld(origin.getName(), info);
         return preparedWorldFuture.thenCompose(preparedWorld->{
             if(preparedWorld != null) {
                 return loadService.loadWorld(preparedWorld).thenApply(worldEntity -> {
-                    return registry.register(this, worldEntity);
+                    return worldRegistry.register(this, worldEntity);
                 });
             }else {
                 return CompletableFuture.completedFuture(null);
@@ -109,10 +109,10 @@ public class ManyWorlds extends BukkitView implements WorldService {
 
     @Override
     public CompletableFuture<ManyWorld> loadWorld(WorldInform info) {
-        CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(info.getWorldCategory()).prepareWorld(info);
+        CompletableFuture<PreparedWorld> preparedWorldFuture = worldRegistry.getWorldDatabase(info.getWorldCategory()).prepareWorld(info);
         return preparedWorldFuture.thenCompose(preparedWorld->{
             if(preparedWorld != null)
-                return loadService.loadWorld(preparedWorld).thenApply(worldEntity-> registry.register(this, worldEntity));
+                return loadService.loadWorld(preparedWorld).thenApply(worldEntity-> worldRegistry.register(this, worldEntity));
             else
                 return CompletableFuture.completedFuture(null);
         });
@@ -122,7 +122,7 @@ public class ManyWorlds extends BukkitView implements WorldService {
     public CompletableFuture<Boolean> save(WorldInform info) {
         WorldEntity entity = worldEntityStorage.getLoadedWorld(info);
         return loadService.unload(entity)
-                .thenCompose(preparedWorld -> executor.async(()-> registry.getWorldDatabase(info.getWorldCategory()).saveWorld(preparedWorld)))
+                .thenCompose(preparedWorld -> executor.async(()-> worldRegistry.getWorldDatabase(info.getWorldCategory()).saveWorld(preparedWorld)))
                 .thenApply(Objects::nonNull);
     }
 
@@ -132,7 +132,7 @@ public class ManyWorlds extends BukkitView implements WorldService {
             World world = Bukkit.getWorld(info.getName());
             if(world != null) {
                 Bukkit.unloadWorld(world, true);
-                registry.unregister(info);
+                worldRegistry.unregister(info);
                 return true;
             }else
                 return false;

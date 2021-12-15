@@ -72,8 +72,8 @@ public class ManyWorldsBukkitBootstrap extends JavaPlugin {
         WorldLoadService loadService = new SWMWorldLoadService(Executors.newScheduledThreadPool(4), swm.getNms(), getLogger());
 
         core = new ManyWorlds(serverName, worldNetwork, controller, registry, storage, loadService, executor, this.getLogger());
-        core.getRegistry().registerDatabase(sample);
-        core.getRegistry().registerDatabase(user);
+        core.getWorldRegistry().registerDatabase(sample);
+        core.getWorldRegistry().registerDatabase(user);
         core.getLoadService().registerWorldFactory(WorldTokens.TYPE, new SWMWorldFactory(registry));
         core.getLoadService().registerWorldFactory(WorldTokens.USER, new SWMWorldFactory(registry));
 
