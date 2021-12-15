@@ -1,6 +1,5 @@
 package com.minepalm.manyworlds.core.netty;
 
-import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import lombok.Getter;
 

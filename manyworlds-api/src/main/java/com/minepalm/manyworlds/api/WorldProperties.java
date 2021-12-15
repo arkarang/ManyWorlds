@@ -1,7 +1,5 @@
 package com.minepalm.manyworlds.api;
 
-import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
-
 public interface WorldProperties{
 
     int getSpawnX();

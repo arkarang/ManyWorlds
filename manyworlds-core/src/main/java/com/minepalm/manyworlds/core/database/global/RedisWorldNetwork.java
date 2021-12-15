@@ -1,8 +1,8 @@
 package com.minepalm.manyworlds.core.database.global;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minepalm.manyworlds.api.entity.BungeeView;
 import com.minepalm.manyworlds.api.WorldNetwork;
+import com.minepalm.manyworlds.api.entity.BungeeView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.core.database.AbstractRedis;
 

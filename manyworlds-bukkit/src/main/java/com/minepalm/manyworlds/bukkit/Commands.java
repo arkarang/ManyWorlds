@@ -17,7 +17,6 @@ import com.minepalm.manyworlds.core.ManyProperties;
 import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,11 +45,8 @@ public class Commands extends BaseCommand {
     public void help(CommandSender sender){
         sender.sendMessage("/월드버킷 도움말 - 도움말을 확인합니다.");
         sender.sendMessage("/월드버킷 전체 - 네트워크 전체에 로드되어 있는 정보를 봅니다.");
-        sender.sendMessage("/월드버킷 번지 - 이 번지코드에 할당 되어 있는 정보를 봅니다.");
         sender.sendMessage("/월드버킷 버킷 <버킷명> - 이 버킷에 할당 되어 있는 정보를 봅니다.");
         sender.sendMessage("/월드버킷 등록 <월드> - 해당 월드를 데이터베이스에 등록합니다.");
-        sender.sendMessage("/월드버킷 생성 <기존월드> <월드명> - 해당 월드를 새로히 생성합니다.");
-        sender.sendMessage("/월드버킷 저장 <월드명> - 로드 되어 있는 월드를 저장하고 언로드합니다.");
     }
 
     @Subcommand("전체")

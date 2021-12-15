@@ -4,9 +4,9 @@ import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.manyworlds.api.WorldLoadService;
 import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
+import com.minepalm.manyworlds.api.bukkit.WorldEntityStorage;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.entity.WorldInform;
-import com.minepalm.manyworlds.api.bukkit.WorldEntityStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -52,7 +52,7 @@ public abstract class AbstractWorldEntityStorage implements WorldEntityStorage {
     @Override
     public CompletableFuture<Void> registerWorld(WorldEntity world) {
         worlds.put(world.getWorldInform().getName(), world);
-        return finalizeRegistration(world).thenRun(()-> executor.async(()->{
+        return finalizeRegistration(world).thenRun(()-> executor.sync(()->{
             World bukkitWorld = Bukkit.getWorld(world.getWorldInform().getName());
             if (bukkitWorld != null) {
                 bukkitWorld.save();
@@ -67,7 +67,7 @@ public abstract class AbstractWorldEntityStorage implements WorldEntityStorage {
         return worlds.remove(str);
     }
 
-    public void shutdown(WorldRegistry registry, WorldLoadService loadService) {
+    public void shutdown(WorldLoadService loadService) {
         List<CompletableFuture<PreparedWorld>> list = new ArrayList<>();
         for (WorldEntity value : worlds.values()) {
             list.add(loadService.unload(value));

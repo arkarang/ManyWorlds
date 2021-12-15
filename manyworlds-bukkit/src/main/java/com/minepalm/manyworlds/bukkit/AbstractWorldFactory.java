@@ -3,9 +3,11 @@ package com.minepalm.manyworlds.bukkit;
 import com.grinderwolf.swm.api.utils.SlimeFormat;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.manyworlds.api.WorldProperties;
-import com.minepalm.manyworlds.api.bukkit.*;
-import com.minepalm.manyworlds.api.entity.WorldInform;
+import com.minepalm.manyworlds.api.bukkit.LoadPhase;
+import com.minepalm.manyworlds.api.bukkit.WorldEntity;
+import com.minepalm.manyworlds.api.bukkit.WorldFactory;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.api.util.WorldInputStream;
 import com.minepalm.manyworlds.api.util.WorldOutputStream;
 import com.minepalm.manyworlds.bukkit.strategies.*;
@@ -17,12 +19,9 @@ import java.util.HashMap;
 
 public abstract class AbstractWorldFactory implements WorldFactory {
 
-    protected final BukkitExecutor executor;
-
     protected final HashMap<LoadPhase, WorldStrategy> strategies = new HashMap<>();
 
-    public AbstractWorldFactory(BukkitExecutor executor){
-        this.executor = executor;
+    public AbstractWorldFactory(){
         strategies.put(LoadPhase.HEADER, new WorldHeaderStrategy());
         strategies.put(LoadPhase.CHUNK, new WorldChunkStrategy());
         strategies.put(LoadPhase.TILE_ENTITY, new WorldTileEntityStrategy());
@@ -38,6 +37,7 @@ public abstract class AbstractWorldFactory implements WorldFactory {
 
         buffer.setName(world.getWorldInform().getName());
         buffer.setVersion(SlimeFormat.SLIME_VERSION);
+        setProperties(buffer, world.getProperties());
 
         WorldInputStream stream = new WorldInputStream(world.getWorldBytes());
 
@@ -45,6 +45,7 @@ public abstract class AbstractWorldFactory implements WorldFactory {
             buffer.setPhase(LoadPhase.getPhase(i));
             strategies.get(LoadPhase.getPhase(i)).deserialize(stream, buffer);
         }
+
         buffer.setPhase(LoadPhase.END);
         WorldEntity result = buildWorldEntity(world.getWorldInform(), world.getProperties(), buffer);
 

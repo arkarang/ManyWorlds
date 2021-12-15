@@ -1,7 +1,8 @@
 package com.minepalm.manyworlds.api;
 
 
-import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.bukkit.WorldCategory;
+import com.minepalm.manyworlds.api.bukkit.WorldEntityStorage;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 

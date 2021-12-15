@@ -1,8 +1,8 @@
 package com.minepalm.manyworlds.core.database.global;
 
+import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.BungeeView;
-import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.core.database.MySQLDatabase;
@@ -11,8 +11,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 public class MySQLWorldNetwork implements WorldNetwork {
@@ -101,18 +105,24 @@ public class MySQLWorldNetwork implements WorldNetwork {
                 list.add(getBukkitServer(rs.getString(1)));
             }
             return list;
-        }).thenApply(futureList->{
-            CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0]));
-            return null;
-            //todo: implements this.
-        });
+        }).thenCompose(futureList-> CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0])).thenApply(ignore->{
+            List<BukkitView> views = new ArrayList<>();
+            for (CompletableFuture<BukkitView> future : futureList) {
+                try {
+                    views.add(future.get());
+                } catch (InterruptedException | ExecutionException ignored) {
+
+                }
+            }
+            return views;
+        }));
     }
 
     @Override
     public CompletableFuture<List<String>> getLoadedWorlds(String serverName) {
         return database.executeAsync(con->{
             List<String> list = new ArrayList<>();
-            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `proxy`=?, `server`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `proxy`=? AND `server`=?");
 
             ps.setString(1, proxyName);
             ps.setString(2, serverName);
@@ -217,7 +227,7 @@ public class MySQLWorldNetwork implements WorldNetwork {
     @Override
     public CompletableFuture<Void> unregisterWorld(String serverName, String sampleName, UUID uuid) {
         return database.executeAsync(con -> {
-            PreparedStatement ps = con.prepareStatement("DELETE FROM " + worldList + " WHERE `server`=?, `world_name`=?");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM " + worldList + " WHERE `server`=? AND `world_name`=?");
             ps.setString(1, serverName);
             ps.setString(2, sampleName + "_" + uuid);
             ps.execute();
@@ -260,7 +270,7 @@ public class MySQLWorldNetwork implements WorldNetwork {
     @Override
     public CompletableFuture<Boolean> isWorldLoaded(String serverName, String sampleName, UUID uuid) {
         return database.executeAsync(con -> {
-            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `server`=?, ``world_name`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT `world_name` FROM " + worldList + " WHERE `server`=? AND `world_name`=?");
             ps.setString(1, serverName);
             ps.setString(2, sampleName + "_" + uuid);
             ResultSet rs = ps.executeQuery();

@@ -1,13 +1,16 @@
 package com.minepalm.manyworlds.bukkit;
 
 import com.minepalm.hellobungee.api.HelloEveryone;
-import com.minepalm.manyworlds.api.*;
-import com.minepalm.manyworlds.api.entity.WorldInform;
+import com.minepalm.manyworlds.api.ManyWorld;
+import com.minepalm.manyworlds.api.WorldController;
+import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.core.AbstractController;
 import com.minepalm.manyworlds.core.netty.WorldCreatePacket;
 import com.minepalm.manyworlds.core.netty.WorldLoadPacket;
+import org.bukkit.Bukkit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -37,9 +40,9 @@ public class ManyWorldController extends AbstractController implements WorldCont
                 }
             }
 
-            if(least != null)
+            if(least != null) {
                 send(least, new WorldCreatePacket(origin, info));
-
+            }
             return least;
         }, service);
     }

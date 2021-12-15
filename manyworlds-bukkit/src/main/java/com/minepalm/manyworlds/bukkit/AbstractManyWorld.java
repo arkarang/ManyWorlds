@@ -7,6 +7,7 @@ import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
+import org.bukkit.Bukkit;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -38,20 +39,22 @@ public abstract class AbstractManyWorld implements ManyWorld{
     @Override
     public CompletableFuture<ManyWorld> create(@Nonnull BukkitView view, WorldInform inform) {
         return isExists().thenCompose(exists->{
-            if(exists){
-                return controller.createSpecific(view, inform, info).thenApply(ignored-> this);
-            }else
+            if(!exists){
+                return controller.createSpecific(view, inform, info);
+            }else {
                 return CompletableFuture.completedFuture(null);
+            }
         });
     }
 
     @Override
-    public CompletableFuture<ManyWorld> create(WorldInform inform) {
+    public CompletableFuture<ServerView> create(WorldInform inform) {
         return isExists().thenCompose(exists->{
-            if(exists){
-                return controller.createAtLeast(inform, info).thenApply(ignored-> this);
-            }else
+            if(!exists){
+                return controller.createAtLeast(inform, info);
+            }else {
                 return CompletableFuture.completedFuture(null);
+            }
         });
     }
 
@@ -73,7 +76,7 @@ public abstract class AbstractManyWorld implements ManyWorld{
     @Override
     public CompletableFuture<ServerView> load() {
         return isLoaded().thenCompose(isLoaded -> {
-            if(isLoaded){
+            if(!isLoaded){
                 return controller.loadAtLeast(this.info);
             }else{
                 return CompletableFuture.completedFuture(ManyWorlds.getInst());
@@ -84,7 +87,7 @@ public abstract class AbstractManyWorld implements ManyWorld{
     @Override
     public CompletableFuture<ServerView> load(BukkitView server) {
         return isLoaded().thenCompose(isLoaded -> {
-            if(isLoaded){
+            if(!isLoaded){
                 return controller.updateSpecific(server, this.info, true).thenCompose(ManyWorld::getLocated).thenApply(Optional::get);
             }else{
                 return CompletableFuture.completedFuture(ManyWorlds.getInst());
@@ -94,7 +97,19 @@ public abstract class AbstractManyWorld implements ManyWorld{
 
     @Override
     public CompletableFuture<Boolean> unload() {
-        return null;
+        return isLoaded().thenCompose(isLoaded -> {
+            if (isLoaded) {
+                return this.getLocated().thenApply(located->{
+                    if(located.isPresent()){
+                        controller.updateSpecific(located.get(), this.info, false);
+                        return true;
+                    }
+                    return false;
+                });
+            } else {
+                return CompletableFuture.completedFuture(true);
+            }
+        });
     }
 
 }

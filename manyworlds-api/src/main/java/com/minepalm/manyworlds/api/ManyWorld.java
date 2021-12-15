@@ -1,6 +1,5 @@
 package com.minepalm.manyworlds.api;
 
-import com.minepalm.manyworlds.api.bukkit.WorldCategory;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
@@ -30,9 +29,9 @@ public interface ManyWorld {
     /**
      * 월드를 적당한 서버에 생성합니다.
      * @param inform 로드할 월드 정보
-     * @return 새로 생성된 월드.
+     * @return 새로 생성된 월드의 서버 위치
      */
-    CompletableFuture<ManyWorld> create(WorldInform inform);
+    CompletableFuture<ServerView> create(WorldInform inform);
 
     /**
      * 월드를 해당 서버에 생성합니다.

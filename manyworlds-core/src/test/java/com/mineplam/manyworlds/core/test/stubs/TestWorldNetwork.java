@@ -1,8 +1,7 @@
 package com.mineplam.manyworlds.core.test.stubs;
 
-import com.minepalm.manyworlds.api.entity.BukkitView;
-import com.minepalm.manyworlds.api.entity.BungeeView;
 import com.minepalm.manyworlds.api.WorldNetwork;
+import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 

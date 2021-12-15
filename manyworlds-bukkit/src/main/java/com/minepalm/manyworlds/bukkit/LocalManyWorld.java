@@ -4,17 +4,11 @@ import com.minepalm.manyworlds.api.ManyWorld;
 import com.minepalm.manyworlds.api.WorldController;
 import com.minepalm.manyworlds.api.WorldNetwork;
 import com.minepalm.manyworlds.api.WorldRegistry;
-import com.minepalm.manyworlds.api.bukkit.WorldCategory;
-import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.api.entity.BukkitView;
-import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
-import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class LocalManyWorld extends AbstractManyWorld {

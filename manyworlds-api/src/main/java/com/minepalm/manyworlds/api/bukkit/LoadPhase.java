@@ -2,11 +2,6 @@ package com.minepalm.manyworlds.api.bukkit;
 
 import java.util.Arrays;
 
-/**
- * 직렬화 순서 입니다.
- * 1. HEADER - 슬라임 월드 포멧 헤더입니다.
- * 2. CHUNK -
- */
 public enum LoadPhase {
     NONE(-1),
     HEADER(0),

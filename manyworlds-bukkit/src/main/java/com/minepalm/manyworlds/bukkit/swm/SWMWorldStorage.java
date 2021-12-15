@@ -1,11 +1,9 @@
 package com.minepalm.manyworlds.bukkit.swm;
 
-import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.nms.SlimeNMS;
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.bukkit.AbstractWorldEntityStorage;
-import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +18,7 @@ public class SWMWorldStorage extends AbstractWorldEntityStorage {
 
     @Override
     protected CompletableFuture<Void> finalizeRegistration(WorldEntity world) {
-        return executor.async(()->{
+        return executor.sync(()->{
             nms.generateWorld((SWMWorldEntity)world);
         });
     }

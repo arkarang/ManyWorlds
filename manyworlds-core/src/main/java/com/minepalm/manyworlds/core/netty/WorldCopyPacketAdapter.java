@@ -1,8 +1,6 @@
 package com.minepalm.manyworlds.core.netty;
 
 import com.minepalm.hellobungee.api.HelloAdapter;
-import com.minepalm.hellobungee.netty.ByteBufUtils;
-import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import io.netty.buffer.ByteBuf;
 

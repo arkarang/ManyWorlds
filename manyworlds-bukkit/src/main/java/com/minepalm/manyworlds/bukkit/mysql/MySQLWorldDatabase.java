@@ -1,18 +1,20 @@
 package com.minepalm.manyworlds.bukkit.mysql;
 
 import com.minepalm.manyworlds.api.WorldProperties;
-import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.bukkit.WorldCategory;
 import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.bukkit.errors.WorldNotExistsException;
 import com.minepalm.manyworlds.core.ManyProperties;
 import com.minepalm.manyworlds.core.database.MySQLDatabase;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
 
 public class MySQLWorldDatabase implements WorldDatabase {
 
@@ -21,11 +23,13 @@ public class MySQLWorldDatabase implements WorldDatabase {
     @Getter
     final WorldCategory category;
     final String table;
+    final Logger logger;
 
-    public MySQLWorldDatabase(WorldCategory category, String table, MySQLDatabase mysql){
+    public MySQLWorldDatabase(WorldCategory category, String table, MySQLDatabase mysql, Logger logger){
         this.category = category;
         this.table = table;
         this.database = mysql;
+        this.logger = logger;
         create();
     }
 
@@ -45,13 +49,17 @@ public class MySQLWorldDatabase implements WorldDatabase {
     @Override
     public CompletableFuture<PreparedWorld> prepareWorld(WorldInform info){
         return database.executeAsync(con->{
+            logger.info("prepare world 1");
             PreparedStatement ps = con.prepareStatement("SELECT `data`, `metadata` FROM " + table + " WHERE `name`=?");
             ps.setString(1, info.getName());
+            logger.info("prepare world 2");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                logger.info("prepare world 3");
                 WorldProperties properties = ManyProperties.fromJson(rs.getString(2));
                 return new PreparedWorld(info, rs.getBytes(1), properties);
             } else {
+                logger.info("prepare world 4");
                 throw new WorldNotExistsException("world does not exists: " + info.getName());
             }
         });
@@ -90,7 +98,8 @@ public class MySQLWorldDatabase implements WorldDatabase {
     @Override
     public CompletableFuture<Boolean> exists(WorldInform inform) {
         return database.executeAsync(con->{
-            PreparedStatement ps = con.prepareStatement("SELECT 1 FROM " + table + " WHERE `name`=?");
+            PreparedStatement ps = con.prepareStatement("SELECT `name` FROM " + table + " WHERE `name`=?");
+            ps.setString(1, inform.getName());
             ResultSet rs = ps.executeQuery();
             return rs.next();
         });

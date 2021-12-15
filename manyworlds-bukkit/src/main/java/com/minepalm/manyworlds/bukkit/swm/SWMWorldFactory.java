@@ -1,10 +1,10 @@
 package com.minepalm.manyworlds.bukkit.swm;
 
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import com.minepalm.manyworlds.api.WorldRegistry;
-import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.api.WorldProperties;
+import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.bukkit.AbstractWorldFactory;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import com.minepalm.manyworlds.bukkit.strategies.WorldBuffer;
@@ -14,15 +14,16 @@ public class SWMWorldFactory extends AbstractWorldFactory {
 
     WorldRegistry registry;
 
-    public SWMWorldFactory(WorldRegistry registry, BukkitExecutor executor) {
-        super(executor);
+    public SWMWorldFactory(WorldRegistry registry) {
         this.registry = registry;
     }
 
     @Override
     protected WorldEntity buildWorldEntity(WorldInform info, WorldProperties properties, WorldBuffer buffer) {
-        buffer.setPropertyMap(((ManyProperties)properties).asSlime());
-        return new SWMWorldEntity(new SWMLoaderAdapter(info, registry.getWorldDatabase(info.getWorldCategory()), ManyWorlds.getInst()), info, buffer);
+        return new SWMWorldEntity(
+                new SWMLoaderAdapter(info, registry.getWorldDatabase(info.getWorldCategory()), ManyWorlds.getInst(), properties),
+                info,
+                buffer);
     }
 
     @Override

@@ -3,10 +3,12 @@ package com.minepalm.manyworlds.core;
 import com.minepalm.manyworlds.api.bukkit.WorldCategory;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Locale;
 
+@ToString
 @EqualsAndHashCode
 public class WorldToken implements WorldCategory {
 

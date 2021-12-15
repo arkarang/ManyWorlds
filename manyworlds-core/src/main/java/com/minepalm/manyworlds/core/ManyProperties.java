@@ -54,14 +54,14 @@ public class ManyProperties implements WorldProperties {
 
     public SlimePropertyMap asSlime() {
         SlimePropertyMap map = new SlimePropertyMap();
-        map.setInt(SlimeProperties.SPAWN_X, spawnX);
-        map.setInt(SlimeProperties.SPAWN_Y, spawnY);
-        map.setInt(SlimeProperties.SPAWN_Z, spawnZ);
-        map.setBoolean(SlimeProperties.ALLOW_MONSTERS, allowMonsters);
-        map.setBoolean(SlimeProperties.ALLOW_ANIMALS, allowAnimals);
-        map.setString(SlimeProperties.WORLD_TYPE, worldType);
-        map.setString(SlimeProperties.ENVIRONMENT, environment);
-        map.setString(SlimeProperties.DIFFICULTY, difficulty);
+        map.setValue(SlimeProperties.SPAWN_X, spawnX);
+        map.setValue(SlimeProperties.SPAWN_Y, spawnY);
+        map.setValue(SlimeProperties.SPAWN_Z, spawnZ);
+        map.setValue(SlimeProperties.ALLOW_MONSTERS, allowMonsters);
+        map.setValue(SlimeProperties.ALLOW_ANIMALS, allowAnimals);
+        map.setValue(SlimeProperties.WORLD_TYPE, worldType);
+        map.setValue(SlimeProperties.ENVIRONMENT, environment);
+        map.setValue(SlimeProperties.DIFFICULTY, difficulty);
         return map;
     }
     @Override

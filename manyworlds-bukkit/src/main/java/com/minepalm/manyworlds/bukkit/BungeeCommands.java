@@ -1,15 +1,14 @@
 package com.minepalm.manyworlds.bukkit;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
+import co.aikar.commands.annotation.*;
 import com.minepalm.manyworlds.api.ManyWorld;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,26 +23,31 @@ public class BungeeCommands extends BaseCommand {
 
     @Subcommand("자동생성")
     @Syntax("/월드번지 자동생성 <타입명> <월드명> - 월드를 적당한 버킷에 할당하여 새로운 월드를 생성합니다.")
+    @SneakyThrows
     public void createAutomatically(CommandSender sender, String type, String worldName){
         sender.sendMessage("자동생성을 시도합니다...");
         ManyWorld mw = service.get(WorldTokens.USER, worldName);
-        mw.isExists().thenApply(exists->{
+        mw.isExists().thenCompose(exists->{
             if(exists){
                 sender.sendMessage("이미 월드가 존재합니다.");
                 return CompletableFuture.completedFuture(null);
             }else{
-                return mw.create(new WorldInform(WorldTokens.TYPE, worldName));
+                return mw.create(new WorldInform(WorldTokens.TYPE, type));
             }
         }).thenAccept(result->{
             if(result != null){
+                Bukkit.getLogger().info("class: "+result.getClass().getSimpleName());
                 sender.sendMessage("월드 생성이 완료되었습니다.");
+            }else{
+                sender.sendMessage("존재하지 않는 월드 타입입니다.");
             }
-        });
+        }).get();
 
     }
 
     @Subcommand("수동생성")
     @Syntax("/월드번지 수동생성 <서버명> <타입명> <월드명> - 월드를 해당 버킷에 할당하여 새로운 월드를 생성합니다. ")
+    @SneakyThrows
     public void createManually(CommandSender sender, String server, String type, String worldName){
         sender.sendMessage("수동생성을 시도합니다...");
         ManyWorld mw = service.get(WorldTokens.USER, worldName);
@@ -67,11 +71,12 @@ public class BungeeCommands extends BaseCommand {
                     }
                 });
             }
-        });
+        }).get();
     }
 
     @Subcommand("자동할당")
     @Syntax("/월드번지 자동할당 <월드명> - 월드를 적당한 버킷에 할당하여 로드합니다.")
+    @SneakyThrows
     public void loadAutomatically(CommandSender sender, String worldName){
         sender.sendMessage("자동할당을 시도합니다...");
         ManyWorld mw = service.get(WorldTokens.USER, worldName);
@@ -91,11 +96,12 @@ public class BungeeCommands extends BaseCommand {
                 }else
                     sender.sendMessage("월드 로드를 실패했습니다.");
             });
-        });
+        }).get();
     }
 
     @Subcommand("수동할당")
     @Syntax("/월드번지 수동할당 <서버명> <월드명> - 월드를 해당 버킷에 로드합니다. ")
+    @SneakyThrows
     public void loadManually(CommandSender sender, String server, String worldName){
         sender.sendMessage("수동할당을 시도합니다...");
         ManyWorld mw = service.get(WorldTokens.USER, worldName);
@@ -123,11 +129,12 @@ public class BungeeCommands extends BaseCommand {
                     });
                 }
             });
-        });
+        }).get();
     }
 
     @Subcommand("언로드")
     @Syntax("/월드번지 언로드 <월드명> - 월드를 언로드합니다.")
+    @SneakyThrows
     public void unload(CommandSender sender, String worldName){
         sender.sendMessage("언로드를 시도합니다...");
         ManyWorld mw = service.get(WorldTokens.USER, worldName);
@@ -137,21 +144,22 @@ public class BungeeCommands extends BaseCommand {
                 sender.sendMessage("월드가 존재하지 않습니다.");
                 return CompletableFuture.completedFuture(null);
             }
-            if(loaded) {
-                sender.sendMessage("이미 월드가 로드되어 있습니다.");
+            if(!loaded) {
+                sender.sendMessage("이미 월드가 언로드되어 있습니다.");
                 return CompletableFuture.completedFuture(null);
             }
             return mw.unload().thenAccept(completed->{
                 if(completed != null){
-                    sender.sendMessage("월드를 로드 완료했습니다.");
+                    sender.sendMessage("월드 언로드를 완료했습니다.");
                 }else
-                    sender.sendMessage("월드 로드를 실패했습니다.");
+                    sender.sendMessage("월드 언로드를 실패했습니다.");
             });
-        });
+        }).get();
     }
 
     @Subcommand("도움말")
-    public void help(Player sender){
+    @Default
+    public void help(CommandSender sender){
         sender.sendMessage("/월드번지 자동생성 <타입명> <월드명> - 월드를 적당한 버킷에 할당하여 새로운 월드를 생성합니다.");
         sender.sendMessage("/월드번지 수동생성 <서버명> <타입명> <월드명> - 월드를 해당 버킷에 할당하여 새로운 월드를 생성합니다. ");
         sender.sendMessage("/월드번지 자동할당 <월드명> - 월드를 적당한 버킷에 할당하여 로드합니다.");

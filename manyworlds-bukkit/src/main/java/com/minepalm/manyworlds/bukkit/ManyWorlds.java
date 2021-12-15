@@ -2,13 +2,14 @@ package com.minepalm.manyworlds.bukkit;
 
 import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
 import com.minepalm.manyworlds.api.*;
-import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.bukkit.WorldCategory;
+import com.minepalm.manyworlds.api.bukkit.WorldEntity;
+import com.minepalm.manyworlds.api.bukkit.WorldEntityStorage;
 import com.minepalm.manyworlds.api.entity.BukkitView;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.entity.ServerView;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.api.netty.Controller;
-import com.minepalm.manyworlds.core.WorldTokens;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -56,7 +57,7 @@ public class ManyWorlds extends BukkitView implements WorldService {
         this.executor = executor;
         this.loadService = service;
         this.worldEntityStorage = storage;
-        
+
         worldNetwork.registerServer();
         worldNetwork.resetWorlds(this);
 
@@ -84,17 +85,25 @@ public class ManyWorlds extends BukkitView implements WorldService {
 
     @Override
     public ManyWorld get(WorldCategory category, String worldName) {
-        throw new UnsupportedOperationException();
+        return get(new WorldInform(category, worldName));
     }
 
     @Override
     public CompletableFuture<ManyWorld> createNewWorld(WorldInform origin, WorldInform info) {
         CompletableFuture<PreparedWorld> preparedWorldFuture = registry.getWorldDatabase(origin.getWorldCategory()).prepareWorld(origin.getName(), info);
         return preparedWorldFuture.thenCompose(preparedWorld->{
-            if(preparedWorld != null)
-                return loadService.loadWorld(preparedWorld).thenApply(worldEntity-> registry.register(this, worldEntity));
-            else
+            if(preparedWorld != null) {
+                return loadService.loadWorld(preparedWorld).thenApply(worldEntity -> {
+                    return registry.register(this, worldEntity);
+                });
+            }else {
                 return CompletableFuture.completedFuture(null);
+            }
+        }).handle((mw, ex)->{
+            if(ex != null){
+                executor.sync((Runnable) ex::printStackTrace);
+            }
+            return mw;
         });
     }
 
@@ -119,7 +128,7 @@ public class ManyWorlds extends BukkitView implements WorldService {
 
     @Override
     public CompletableFuture<Boolean> unload(WorldInform info) {
-        return executor.async(()->{
+        return executor.sync(()->{
             World world = Bukkit.getWorld(info.getName());
             if(world != null) {
                 Bukkit.unloadWorld(world, true);

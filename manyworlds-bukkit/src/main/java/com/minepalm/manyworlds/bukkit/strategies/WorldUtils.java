@@ -137,7 +137,7 @@ public class WorldUtils {
     }
 
     public static Map<Long, SlimeChunk> readChunks(byte worldVersion, int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
-        Bukkit.getLogger().warning("chunkdata: "+chunkData.length);
+        //Bukkit.getLogger().warning("chunkdata: "+chunkData.length);
         ByteArrayInputStream bs = new ByteArrayInputStream(chunkData);
         DataInputStream dataStream = new DataInputStream(bs);
         Map<Long, SlimeChunk> chunkMap = new HashMap<>();

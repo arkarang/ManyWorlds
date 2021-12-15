@@ -1,17 +1,15 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.minepalm.arkarangutils.bukkit.BukkitExecutor;
-import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.api.WorldLoadService;
-import com.minepalm.manyworlds.api.WorldRegistry;
-import com.minepalm.manyworlds.api.bukkit.*;
+import com.minepalm.manyworlds.api.bukkit.WorldCategory;
+import com.minepalm.manyworlds.api.bukkit.WorldEntity;
+import com.minepalm.manyworlds.api.bukkit.WorldFactory;
 import com.minepalm.manyworlds.api.entity.PreparedWorld;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;

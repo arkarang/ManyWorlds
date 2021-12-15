@@ -1,11 +1,9 @@
 package com.minepalm.manyworlds.bukkit.swm;
 
-import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.minepalm.manyworlds.api.WorldProperties;
 import com.minepalm.manyworlds.api.bukkit.WorldEntity;
 import com.minepalm.manyworlds.api.entity.WorldInform;
-import com.minepalm.manyworlds.api.bukkit.WorldFactory;
 import com.minepalm.manyworlds.bukkit.strategies.WorldBuffer;
 import lombok.Getter;
 

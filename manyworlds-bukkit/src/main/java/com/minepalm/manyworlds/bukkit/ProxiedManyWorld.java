@@ -1,13 +1,13 @@
 package com.minepalm.manyworlds.bukkit;
 
-import com.minepalm.manyworlds.api.*;
-import com.minepalm.manyworlds.api.entity.WorldInform;
-import com.minepalm.manyworlds.api.bukkit.WorldCategory;
+import com.minepalm.manyworlds.api.ManyWorld;
+import com.minepalm.manyworlds.api.WorldController;
+import com.minepalm.manyworlds.api.WorldNetwork;
+import com.minepalm.manyworlds.api.WorldRegistry;
 import com.minepalm.manyworlds.api.entity.BukkitView;
-import com.minepalm.manyworlds.api.entity.ServerView;
+import com.minepalm.manyworlds.api.entity.WorldInform;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class ProxiedManyWorld extends AbstractManyWorld {

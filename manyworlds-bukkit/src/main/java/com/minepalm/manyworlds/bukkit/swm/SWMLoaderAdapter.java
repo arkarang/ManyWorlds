@@ -1,7 +1,9 @@
 package com.minepalm.manyworlds.bukkit.swm;
 
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
+import com.minepalm.manyworlds.api.WorldProperties;
 import com.minepalm.manyworlds.api.bukkit.WorldDatabase;
+import com.minepalm.manyworlds.api.entity.PreparedWorld;
 import com.minepalm.manyworlds.api.entity.WorldInform;
 import com.minepalm.manyworlds.bukkit.ManyWorlds;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class SWMLoaderAdapter implements SlimeLoader {
     final WorldInform inform;
     final WorldDatabase database;
     final ManyWorlds service;
+    final WorldProperties properties;
 
     @SneakyThrows
     @Override
@@ -36,6 +39,7 @@ public class SWMLoaderAdapter implements SlimeLoader {
 
     @Override
     public void saveWorld(String s, byte[] bytes, boolean lock) throws IOException {
+        database.saveWorld(new PreparedWorld(inform, bytes, properties));
         service.save(inform);
     }
 

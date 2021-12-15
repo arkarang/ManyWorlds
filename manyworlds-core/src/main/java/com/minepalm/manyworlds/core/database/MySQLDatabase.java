@@ -46,8 +46,8 @@ public class MySQLDatabase {
         service.submit(() -> {
             try (Connection con = dataSource.getConnection()) {
                 future.complete(function.acceptThrowing(con));
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                future.completeExceptionally(e);
             }
             return null;
         });
